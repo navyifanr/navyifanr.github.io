@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://navyifanr.github.io/2019/05/19/kotlin-usage-tips/</loc>
+    
+    <lastmod>2020-06-19T16:34:06.640Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/07/18/wechat-mars-android-sample-source-code-analyze/</loc>
+    
+    <lastmod>2019-06-10T16:04:39.999Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/07/29/Android-NDK-dev-JNI-s-foundation/</loc>
+    
+    <lastmod>2019-06-10T15:46:03.282Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/08/19/Android-NDK-dev-practice-samples/</loc>
+    
+    <lastmod>2019-06-10T15:34:17.459Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2018/05/26/the-communication-skill-with-the-product-manager/</loc>
+    
+    <lastmod>2019-06-03T09:47:30.501Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/12/24/how-to-improve-the-development-efficiency-of-the-work/</loc>
+    
+    <lastmod>2018-01-07T09:28:48.553Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/08/05/Android-NDK-dev-JNI-s-practice/</loc>
+    
+    <lastmod>2017-12-11T03:20:12.822Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/01/24/solve-Android-video-guide-page-black-screen/</loc>
+    
+    <lastmod>2017-11-29T15:40:26.416Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/08/26/Android-NDK-dev-CMake-s-usage/</loc>
+    
+    <lastmod>2017-08-26T09:52:39.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2017/07/28/Android-dev-cpp-foundation-knowlege-notes/</loc>
+    
+    <lastmod>2017-07-29T14:14:48.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/12/25/the-final-summary-of-2016/</loc>
+    
+    <lastmod>2017-05-12T02:14:38.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/07/20/Android-code-style/</loc>
+    
+    <lastmod>2017-03-23T15:03:06.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/07/13/art-of-android-development-chapter-3/</loc>
+    
+    <lastmod>2017-02-20T08:34:52.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/07/15/art-of-android-development-chapter-4/</loc>
+    
+    <lastmod>2017-02-14T08:39:57.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/07/10/art-of-android-development-chapter-2/</loc>
+    
+    <lastmod>2017-02-14T08:28:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/07/07/art-of-android-development-chapter-1/</loc>
+    
+    <lastmod>2017-02-14T08:20:59.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/12/28/bye2015hi2016/</loc>
+    
+    <lastmod>2016-12-11T08:09:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/12/07/use-Builder-pattern-realize-a-new-function-guide-page-manager/</loc>
+    
+    <lastmod>2016-12-09T02:58:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/04/04/how-to-use-apktool/</loc>
+    
+    <lastmod>2016-12-08T09:55:51.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/04/25/Android-realize-multi-type-item-s-layout-by-ListView/</loc>
+    
+    <lastmod>2016-12-08T09:55:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/08/10/Android-Handler-AsyncTask-Thread-and-Service/</loc>
+    
+    <lastmod>2016-12-08T09:55:33.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/03/29/android-studio-SQLite-database-example/</loc>
+    
+    <lastmod>2016-12-08T09:55:22.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2016/06/26/clear-redundancy-Java-code-toolol%E2%80%94Lombok/</loc>
+    
+    <lastmod>2016-11-14T06:55:49.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2014/12/30/the-reading-summary-for-2014/</loc>
+    
+    <lastmod>2016-06-13T07:16:56.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/05/25/The-simple-analysis-of-Startup-News-App-source-code/</loc>
+    
+    <lastmod>2016-06-13T07:15:19.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/08/23/the-summary-of-working-one-month/</loc>
+    
+    <lastmod>2016-06-13T07:12:30.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/05/03/a-basic-understanding-of-android-dependency-injection/</loc>
+    
+    <lastmod>2016-06-12T15:11:17.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/02/02/Effective-Java-create-and-destroy-object/</loc>
+    
+    <lastmod>2016-06-12T15:11:17.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/05/09/Automatically-detect-memory-leaks%E2%80%94LeakCanary/</loc>
+    
+    <lastmod>2016-06-12T15:11:13.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/04/09/design-pattern-thinking-I/</loc>
+    
+    <lastmod>2016-06-12T15:11:06.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/04/11/design-pattern-thinking-II/</loc>
+    
+    <lastmod>2016-06-12T15:11:06.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/04/13/design-pattern-thinking-III/</loc>
+    
+    <lastmod>2016-06-12T15:11:05.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/07/18/find-a-job-in-Hangzhou/</loc>
+    
+    <lastmod>2016-06-12T15:11:04.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/05/09/LeakCanary-project/</loc>
+    
+    <lastmod>2016-06-12T15:11:03.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2015/07/26/make-the-information-simplified/</loc>
+    
+    <lastmod>2016-06-12T15:11:02.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2014/12/31/the-final-summary-for-2014/</loc>
+    
+    <lastmod>2016-06-12T15:11:01.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://navyifanr.github.io/2014/12/18/why-I-want-to-write-a-blog/</loc>
+    
+    <lastmod>2016-06-12T15:10:49.000Z</lastmod>
+    
+  </url>
+  
+</urlset>
