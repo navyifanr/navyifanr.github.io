@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Startup News App源码简单分析 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Startup News App源码简单分析</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2015-05-25 15:43:11</span>
+        <span class="mobile">2015-05-25 15:43</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">源码分析</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>很久之前就了解到冯大辉弄的这个<a class="link"   target="_blank" rel="noopener" href="http://news.dbanotes.net/" >Startup News<i class="fas fa-external-link-alt"></i></a>, 有点类似国外Hacker news的技术分享平台，也经常浏览。后来发现Startup News的Android客户端是开源的，而网络上也有很多这种技术资讯的分享平台(如推酷，极客头条等)，所以想了解下这样的资讯平台的客户端是怎样实现的，所以就有了以下对Startup News的源码的简单分析和极客头条客户端的开发。</p>
+<p>由于个人水平和时间有限，所以只是简单分析了SN的功能如何实现，学习其中实现方法和编程规范，至于SN用到actionbarsherlock，没使用过，而且现在有ToolBar代替，就没有详细了解了。</p>
+<span id="more"></span>
+
+<p>项目地址：<a class="link"   target="_blank" rel="noopener" href="https://github.com/halzhang/StartupNews" >StartupNews<i class="fas fa-external-link-alt"></i></a></p>
+<h3 id="1-编码规范："><a href="#1-编码规范：" class="headerlink" title="1.编码规范："></a>1.编码规范：</h3><p>代码的编码规范很重要，作者有写相关的编码规范文档，可以参考借鉴下：<a class="link"   target="_blank" rel="noopener" href="https://github.com/halzhang/StartupNews/wiki/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83" >StartupNews编码规范<i class="fas fa-external-link-alt"></i></a></p>
+<h3 id="2-程序入口MyApplication和抽象的常量类Constants"><a href="#2-程序入口MyApplication和抽象的常量类Constants" class="headerlink" title="2.程序入口MyApplication和抽象的常量类Constants"></a>2.程序入口MyApplication和抽象的常量类Constants</h3><p>MyApplication：<br>a.管理应用线程的线程工厂ThreadFactory和线程池ExecutorService<br>b.初始化谷歌分析EasyTracker<br>c.程序崩溃信息收集CrashHandler<br>d.SessionManager<br>e.初始化文章的已读记录和存储访问历史记录，用<strong>哈希表HashSet<String> mHistorySet以文件的方式存储</strong>(访问查找时，比较高效。不用使用数据库)<br>此处用到多个单例模式，如bcd都有用到；</p>
+<p>抽象的常量类Constants主要定义了一些存储到SD卡的信息，如程序崩溃的log，历史记录，登录后的cookie等；</p>
+<h3 id="3-包规范化："><a href="#3-包规范化：" class="headerlink" title="3.包规范化："></a>3.包规范化：</h3><p>com.halzhang.apps.startupnews.ui    应用的Activity和Fragment<br>com.halzhang.apps.startupnews.ui.phone  浏览文章时适配手机BrowseActivity<br>com.halzhang.apps.startupnews.ui.tablet 适配平板的Fragment<br>com.halzhang.apps.startupnews.ui.widgets 自定义控件<br>com.halzhang.apps.startupnews.utils  实用工具包，日期处理DateUtils, SharePreference数据的Preference，不同android版本处理的UIUtils, 崩溃日志记录CrashHandler等<br>com.halzhang.apps.startupnews.snkit  工具箱，解析Html的JsoupFactory，SessionManager和对应的api<br>com.halzhang.apps.startupnews.parser 解析器，对文章列表、评论进行解析<br>com.halzhang.apps.startupnews.entity 各个实体类的定义，实现序列化的接口<br>com.halzhang.apps.startupnews.analytics  谷歌分析的异常解析ExceptionParser</p>
+<h3 id="4-主要分析"><a href="#4-主要分析" class="headerlink" title="4.主要分析"></a>4.主要分析</h3><p><strong>Activity：</strong><br>a.由于不用登录就可以直接查看app的内容，所以启动MyApplication后，就算用户没有登录，也不需先执行LoginActivity，而是直接执行MainActivity。</p>
+<p>b.应用主要内容有三块：热门文章、最新文章和最新评论，是通过顶部标签导航效果来呈现的，代码是用JakeWharton的开源框架ViewPageIndicator实现。相关例子：<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/xiaanming/article/details/10766053" >Android 开源框架ViewPageIndicator 和 ViewPager 仿网易新闻客户端Tab标签<i class="fas fa-external-link-alt"></i></a>。</p>
+<p>c.初始化布局setupViews()，作者做了适应不同屏幕的处理;<br>d.反馈部分，通过发email反馈的方式；<br>e.登录部分，LoginActivity，先通过SessionManager判断用户是否登录，显示登录或注销状态；此处用到的是Fragment(切换登录布局和正在登录进度条的布局，减少Activity的不必要跳转)，两个异步任务：LoginPreTask利用Jsoup获取到登录的表单，将登录数据放进表单，在用UserLoginTask发送登录请求(并进行cookie管理，保存登录数据)</p>
+<p>f.设置模块，AboutActivity，使用的是actionbarsherlock库的SherlockPreferenceActivity，此处将一些设置的常量存储在SharePreference中；</p>
+<p>SNApiHelper处理用户投票（长按列表会有投票功能），使用WeakReference<Activity></p>
+<p><strong>Fragment:</strong></p>
+<p>a.热门文章和最新文章布局一样，同用NewsListFragment(继承抽象的AbsBaseListFragment)，使用PullToRefreshListView框架来实现列表的下拉刷新和上拉加载更多，注意此处news列表的点击事件不是在NewslistFragment处理的，而是将事件在MainActivity调用处理；</p>
+<p>b.当点击news列表时，跳转事件和存储访问记录addHistory()的事件是被封装在ActivityUtils的类里面；</p>
+<p>c.跳转后，如果是平板，更新右栏，切换到BrowseFragment，如果是手机，跳转到BrowseActivity处理(布局是Fragment，处理方法将BrowseFragment添加到布局中)。另外，文章的加载使用的是自定义的WebView: ObservableWebView，添加上下滚动的监听接口，以判断隐藏还是显示底部的菜单bar;<br>此处将WebView和底部bar的点击事件封装成WebViewController</p>
+<p>……</p>
+<p>(有点乱-_-)</p>
+<p><code>&lt;完毕&gt;</code></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">#源码分析</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2015/07/26/make-the-information-simplified/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">信息极简化</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2015/05/09/LeakCanary-project/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">LeakCanary开源项目</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            浅谈项目中需求变更和拖延的问题 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">浅谈项目中需求变更和拖延的问题</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2018-05-26 17:32:33</span>
+        <span class="mobile">2018-05-26 17:32</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D/">总结反思</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>站在移动端开发人员的角度，谈谈项目开发中产品经理该如何更合理地处理需求变更和项目拖延的问题。<code>(以前团队内部分享总结的，重新发出来)</code></p>
+<h3 id="引子：当开发人员说“技术无法实现”的时候，是想表达什么？"><a href="#引子：当开发人员说“技术无法实现”的时候，是想表达什么？" class="headerlink" title="引子：当开发人员说“技术无法实现”的时候，是想表达什么？"></a>引子：当开发人员说“技术无法实现”的时候，是想表达什么？</h3><ul>
+<li>需求太傻了，完全没必要做；</li>
+</ul>
+<p>比如那种根据手机壳颜色变换主题颜色的功能。</p>
+<ul>
+<li>时间和资源不够，成本太高，不想去做；</li>
+</ul>
+<p>比如项目周期就两个月，自研 IM 的功能根本完成不了，而且实现的效果未必有第三方IM功能好。</p>
+<ul>
+<li>从项目代码上改动太大，开发人员不愿做；</li>
+</ul>
+<p>比如，之前遇到一个需求：应用所有页面除了以下两种情况其余都可以调起摇一摇客服弹窗：已经有弹窗出现的时候，不能调起摇一摇客服弹窗；在客服页面或引导蒙层页面，不能调起。按照常规的实现方式，需要每个页面和每个对话框都去实现一遍是否启动摇一摇客服的逻辑，这样代码改动会很大；如果之前的页面逻辑时每个页面或对话框都是继承一个 Base 类，那实现起来就简单很多。</p>
+<span id="more"></span>
+
+<ul>
+<li>不理解这个需求的价值，认为实现这个功能没有价值；</li>
+</ul>
+<p>开发不是代码机器，要交代清楚产品的需求价值。</p>
+<ul>
+<li>自己的技术能力有限，无法实现；</li>
+<li>从技术角度看，根本无法实现；</li>
+</ul>
+<h3 id="如何和开发谈需求变更？"><a href="#如何和开发谈需求变更？" class="headerlink" title="如何和开发谈需求变更？"></a>如何和开发谈需求变更？</h3><p>首先思考一个问题：为什么会有需求变更？<br>原因可能有以下几点：<br>1.自己原来没想清楚，现在想明白了，需要变更需求；<br>2.需求方或老板的需求变了；<br>3.当前的市场环境变了；<br>4.需求文档或原型写得不清晰，或团队间的理解不统一，以为需求变了；</p>
+<p>对于1和4是自身主观原因导致的需求变更，需要提升自身的产品能力，完善需求文档或原型；对于2和3环境的客观原因，不可控；</p>
+<p>在自己想清楚确实需要变更需求时，需要做好以下几点，和开发沟通需求变更：</p>
+<ul>
+<li><p><strong>1. 更新需求文档或产品原型</strong><br>口头沟通的需求，很容易被忘记，必须记录在案，方便后续撕逼，或测试做测试用例；而且开发一般也是根据需求文档或原型做开发的；</p>
+</li>
+<li><p><strong>2. 阐明需求变更的原因</strong><br>不管是主观还是客观原因造成的需求变更，都应该主动背锅，详细说明需求变更的意义，同时要尊重开发，<strong>不要以一种“指挥”的口气下发你的需求，然后让他们干活</strong>。产品经理通常不是开发人员的老大，不能直接指挥他们，而是要说服、激励他们，让他们发挥能动性去做事，和他们沟通遇到分歧，切忌跋扈专横地做决定，要尊重他们的想法，并说出自己的设计初衷，好好商量。</p>
+</li>
+<li><p><strong>3.在变更需求时，一定要及时同步相关的开发人员和测试人员</strong>，避免信息不对称，出现做无用功和不必要沟通的情况；<br>不要出现iOS实现了新需求，而Android还是按照老需求去做；或是测试人员按照原有需求逻辑去测试新需求的情况；</p>
+</li>
+<li><p><strong>4. 明确好需求变更后的排期</strong><br>大的需求变更，影响到项目上线时间，产品经理最好能协调延迟上线，毕竟大家按照原有项目进度都有心理预期。如果排期实在无法改变，需要大家加班时，也要提前打预防针，避免临近上线才加班赶进度，同时，加班时最好能够陪同，避免出现需求的疑问，无人解答；</p>
+</li>
+</ul>
+<h3 id="如何应对项目的拖延"><a href="#如何应对项目的拖延" class="headerlink" title="如何应对项目的拖延"></a>如何应对项目的拖延</h3><p>通常情况下工程师一般不会偷懒的，如果需要催，一般是项目流程或安排不太合理，造成拖延。项目拖延的原因以及解决办法：</p>
+<ul>
+<li><p><strong>1.需求的变更</strong>。产品的需求或者由于前期准备不充足或新的用户反馈需要修改，从而增加了开发时间。<br>解决：参考前面所说的需求变更的问题；</p>
+</li>
+<li><p><strong>2.开发时间的前期预估不准确。</strong>本来需要几个星期才可以完成的事情，之前过于乐观地估计了更短的时间。</p>
+</li>
+</ul>
+<p>开发时间预估，我见过几种：</p>
+<blockquote>
+<p>a. 产品经理直接给开发一个截止时间；<br>b. 产品经理和各端(前后端、设计)组长商讨一个开发时间；<br>c. 产品经理和开发人员过完需求会议后，各端组长分配任务，然后让各个开发人员预估自己负责模块的开发时间，最终综合给出一个预估时间；</p>
+</blockquote>
+<p>第1种，完全是对开发人员的不尊重，产品经理太强势，往往最终只能被迫加班赶进度；<br>第2种，虽然是开发时间是和各端人员商讨的，但毕竟分配任务时，不是组长去完成任务，所以开发时间肯定和实际的时间不太一致；<br>第3中，给足开发者以尊重，可以自己预估开发时间，而不是只能接受任务，这样的主观能动性也会强一点，一旦出现按照规定的时间完成不了任务，也就只能自觉加班了，往往最终能够按照预期完成任务；（对于加班，作为开发的角度，我觉得还是按照这种，每天规定好自己的任务和进度，不完成就自觉加班，比盲目的加班容易接受点）</p>
+<p>所以，<strong>对于开发时间的预估，最好能够让开发人员的自己根据任务预估每项的工作量，和截止时间，这样最终如果完成不了，他们也会自觉加班。</strong></p>
+<p>问题：开发人员预估时间过高的怎么办？<br>当然会有这种可能的出现，这是就需要和小组组长协商，适量压缩时间，或者在预估时间前，先给个预期的时间，然后让他们根据需求优选级排序来预估时间。</p>
+<ul>
+<li><p><strong>3.沟通遇到了问题</strong>，当工程师发现某个功能其实难度非常高， 执行压力大的时候，没有尽早沟通，deadline 快到了才说，耽误了工期；<br>产品经理需要时刻跟进项目进度，了解开发情况；</p>
+</li>
+<li><p><strong>4.产品功能的设计过于烦琐</strong>，本来可以简化的功能，却花费了大量的时间，其实这个功能根本不需要浪费这么长的时间。</p>
+</li>
+</ul>
+<p>产品经理在开发前就应该和开发讨论需求的合理性，避免出现功能设计的过于繁杂；</p>
+<ul>
+<li><p><strong>5.过多无谓的会议占用了开发的时间</strong><br>不要频繁开会，开会尽量要小，会议尽量要短，避免低效会议，每个参会的人都是与项目相关的，要保证<strong>“非直接负责人不参会”</strong>的原则；没必要每天站会，一周开会2-3次汇报进度即可。</p>
+</li>
+<li><p><strong>6.不要临近上线增加需求，或准备上线那天，才去验收产品</strong></p>
+</li>
+</ul>
+<p>开发最讨厌的就是临近上线更改需求，有些需求不是特别紧急，没必要赶在上线的节骨眼去完成；同时，产品有个提前3-4天验收产品，避免出现突发意外影响上线进度。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>产品经理首先要提高自己的专业度，尽量减少需求的变更，更改需求，一定要说明原因；并给予开发人员足够的尊重，才能提高与开发人员协作的效率。</p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/%E6%80%BB%E7%BB%93%E5%8F%8D%E6%80%9D/">#总结反思</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2019/05/19/kotlin-usage-tips/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Kotlin 开发小 tips</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2017/12/24/how-to-improve-the-development-efficiency-of-the-work/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">如何提高工作中的开发效率？</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

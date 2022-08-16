@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android开发艺术探索笔记-2.IPC机制 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android开发艺术探索笔记-2.IPC机制</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-07-10 23:42:17</span>
+        <span class="mobile">2016-07-10 23:42</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="2-1-Android-IPC简介"><a href="#2-1-Android-IPC简介" class="headerlink" title="2.1 Android IPC简介"></a>2.1 Android IPC简介</h3><p>IPC是Inter-Process Communication的缩写，是进程间的通信或跨进程通信，指两个进程之间进行数据交换的过程。线程是CPU调度的最小单位，是一种有限的系统资源，而进程一般指一个执行单元，可以包含多个线程。任何一个系统都有IPC机制，Linux上是通过命令管道、共享内容、信号量来进行进程间通信的。</p>
+<h3 id="2-2-Android中的多进程模式"><a href="#2-2-Android中的多进程模式" class="headerlink" title="2.2 Android中的多进程模式"></a>2.2 Android中的多进程模式</h3><p>(1). 开启多进程模式<br>为四大组件在AndroidManifest中指定android:process属性：</p>
+<ul>
+<li>指定完整进程名，如android:process&#x3D;”com.google.play.remote”。</li>
+<li>以“:”开头，比如设置为android:process&#x3D;”:remote”。则系统会在实际运行的进程名前加上应用程序的包名，即变成“com.google.play:remote”</li>
+</ul>
+<span id="more"></span>
+
+<p>另外一种非常规的方法是通过JNI在native层去fork一个新的进程。<br>Android系统会为每个应用分配一个唯一的UID，具有相同UID的应用才能共享数据。<strong>两个应用通过ShareUID跑在同一个进程中是有要求的，需要这两个应用有相同的ShareUID并且签名相同才可以。</strong></p>
+<p>(2). 多进程模式的运行机制<br>Android为每个应用（或者说进程）分配一个独立的虚拟机，不同的虚拟机在内存分配上有不同的地址空间，会导致在不同的虚拟机访问同一个类的对象会产生多份副本。使用多进程一般会造成以下4个问题：</p>
+<ul>
+<li>静态成员和单例模式完全失效；（不是同一内存，多个副本）</li>
+<li>线程同步机制完全失效；（不是同一内存，对象不一样，锁对象或锁全局类都无法保证线程同步）</li>
+<li>SharePreferences的可靠性下降（不支持并发读写）；</li>
+<li>Application会多次创建；（不同进程的组件拥有独立的虚拟机、Application和内存空间）</li>
+</ul>
+<h3 id="2-3-IPC基础概念介绍"><a href="#2-3-IPC基础概念介绍" class="headerlink" title="2.3 IPC基础概念介绍"></a>2.3 IPC基础概念介绍</h3><p>(1).Serializable接口</p>
+<ul>
+<li>最好指定serialVersionUID，以防止可能由于类变动而引起的反序列化失败</li>
+<li>静态成员变量属于类不属于对象，不参与序列化过程</li>
+<li>用transient关键字标记的成员变量不参与序列化过程</li>
+</ul>
+<p>(2).Parcelable接口<br>Parcelable主要用在内存序列化上，可以直接序列化的有Intent、Bundle、Bitmap以及List和Map(前提里面元素可以序列化)等。</p>
+<p>对比：</p>
+<ul>
+<li>Serializable是Java中的序列化接口，使用简单但是开销很大，序列化和反序列化过程需要大量I&#x2F;O操作。</li>
+<li>Parcelable是Android中的序列化方式，更适合用Android平台上，使用起来稍微麻烦，但是效率高，是Android推荐的序列化方式，因此首选Parcelable。</li>
+<li>Parcelable主要用在内存序列化上，但是把它用在<strong>序列化到设备 或 通过网络传输</strong>会比较麻烦，这两种场景下建议使用Serializable。</li>
+</ul>
+<p>(3).Binder</p>
+<p><strong>什么是Binder？</strong></p>
+<ul>
+<li>Binder是Android中的一个类，它实现了IBinder接口。</li>
+<li>从IPC角度来说，Binder是Android中的一种跨进程通信方式。</li>
+<li>Binder还可以理解为一种虚拟的物理设备，它的设备驱动是&#x2F;dev&#x2F;binder，该通信方式在Linux中没有</li>
+<li>从Android Framework角度说，<strong>Binder是ServiceManager连接各种Manager(ActivityManager、WindowsManager…)和相应ManagerService的桥梁</strong></li>
+<li>从应用层角度，<strong>Binder是客户端和服务器端进行通信的媒介，当bindService的时候，服务端会返回一个包含了服务端业务调用的Binder对象，客户端通过这个对象获取服务端提供服务（包括普通服务和基于AIDL的服务）或数据</strong></li>
+</ul>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/binder-work-principle.jpg" alt="Binder的工作机制"></p>
+<p>附：<a class="link"   target="_blank" rel="noopener" href="http://www.woaitqs.cc/android/2016/05/26/android-binder-token" >Binder 架构分为 Client、Server、Service Manager 和 Binder Driver。<i class="fas fa-external-link-alt"></i></a><br><img src="http://7xigjz.com1.z0.glb.clouddn.com/binder-archi-design-image.png" alt="Binder架构设计图.png"></p>
+<ul>
+<li>Client: 服务调用者，一般就是我们应用开发者，通过调用诸如List<PackageInfo> packs &#x3D; getActivity().getPackageManager().getInstalledPackages(0);<br> 这样的代码，来向 ServerManager 请求 Package 服务。</li>
+<li>Server: 服务提供者，这里面会有许多我们常用的服务，例如 ActivityService 、 WindowMananger， 这些系统服务提供的功能，是的我们能够使用 Wifi，Display等等设备，从而完成我们的需求。</li>
+<li>Service Manager: 这里是类似于前文中的DNS，绝大多数的服务都是通过 Service Manager来获取，通过这个 DNS 来屏蔽掉 对其他Server的直接操作。</li>
+<li>Binder Driver: 底层的支持逻辑，在这里承担路由的工作，不论风雨，使命必达，即使对面的server挂掉了，也会给你相应的死亡通知单 (Death Notification)</li>
+</ul>
+<p>总结起来说，应用程序(Client) 首先向 Service Manager 发送请求 WindowManager 的服务，Service Manager 查看已经注册在里面的服务的列表，找到相应的服务后，通过 Binder kernel 将其中的 Binder 对象返回给客户端，从而完成对服务的请求。</p>
+<p><strong>既然Linux没有Binder，那Android为什么要设计Binder?</strong></p>
+<blockquote>
+<p>性能和安全。在移动设备上，广泛地使用跨进程通信肯定对通信机制本身提出了严格的要求；Binder相对出传统的Socket方式，更加高效；另外，传统的进程通信方式对于通信双方的身份并没有做出严格的验证，只有在上层协议上进行架设；比如Socket通信ip地址是客户端手动填入的，都可以进行伪造；而Binder机制从协议本身就支持对通信双方做身份校检，因而大大提升了安全性。这个也是Android权限模型的基础。</p>
+</blockquote>
+<blockquote>
+<p>第一. Binder能够很好的实现Client-Server架构;<br>第二. Binder的传输效率和可操作性很好;<br>Socket传输效率很低；消息队列和管道又采用存储-转发方式，使用它们进行IPC通信时，需要经过2次内存拷贝，效率太低！共享内存，内存拷贝次数是0，但共享内存操作复杂<br>第三. Binder机制的安全性很高;</p>
+</blockquote>
+<h3 id="2-4-Android中的IPC方式"><a href="#2-4-Android中的IPC方式" class="headerlink" title="2.4 Android中的IPC方式"></a>2.4 Android中的IPC方式</h3><p>(1).使用Bundle<br>四大组件中三大组件（Activity、Service、Receiver）都支持在Intent中传递Bundle数据</p>
+<p>(2).使用文件共享<br>存在并发读写问题。由于系统对SharedPreferences文件的读写有一定的缓存策略，即在内存中会有一份SharedPreferences文件的缓存，因此在多进程模式下，系统对它的读写就变得不可靠，当面对高并发读写访问的时候，有很大几率会丢失数据，因此，<strong>不建议在进程间通信中使用SharedPreferences。</strong></p>
+<p>(3).使用Messenger<br>Messenger是轻量级的IPC方案，它的底层实现是AIDL。但Messenger是以串行的方式处理请求的，即服务端只能一个个处理，不能实现并发。<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/messenger-work-principle.jpg" alt="Messenger工作原理图"></p>
+<p>(4).使用AIDL</p>
+<ul>
+<li>服务端：创建Service监听客户端请求，创建AIDL文件声明需要暴露给客户端的接口，在Service中实现这个AIDL接口。</li>
+<li>客户端：绑定服务端Service，将服务端返回的Binder对象转成AIDL接口所属类型，就可以调用AIDL中的方法了。</li>
+</ul>
+<blockquote>
+<p>a.AIDL支持的数据类型有限: 基本数据类型、String和CharSequence、ArrayList、HashMap、Parcelable以及AIDL<br>b.某些类即使和AIDL文件在同一个包中也要<strong>显式import进来</strong>；<br>c.AIDL中除了基本数据类，其他类型的参数都要标上方向: in, out或者inout<br>d.<strong>AIDL接口中支持方法，不支持声明静态变量；</strong><br>e.为了方便AIDL的开发，建议把所有和AIDL相关的类和文件全部放入同一个包中，这样做的好处是，当客户端是另一个应用的时候，可以直接把整个包复制到客户端工程中。<br>f.RemoteCallbackList是系统专门提供的用于删除跨进程Listener的接口。RemoteCallbackList是一个泛型，支持管理任意的AIDL接口，因为所有的AIDL接口都继承自IInterface接口。</p>
+</blockquote>
+<p>(5).使用ContentProvider<br><strong>和Messenger一样，底层实现是Binder。</strong></p>
+<blockquote>
+<ul>
+<li>自定义ContenProvider需要实现6个抽象方法：onCreate, 由系统回调，并运行在主线程; query、update、insert、delete、getType: 由外界回调，并运行在Binder线程池中。</li>
+</ul>
+</blockquote>
+<ul>
+<li>ContentProvider还支持文件数据，比如图片、视频等，系统提供的MediaStore就是文件类型的ContentProvider；</li>
+<li>ContentProvider对底层的数据存储方式没有任何要求，可以是SQLite、文件，甚至是内存中的一个对象都行；</li>
+<li>要观察ContentProvider中的数据变化情况，可以通过ContentResolver<br>的registerContentObserver方法来注册观察者；</li>
+</ul>
+<p>(6).使用Socket<br>Socket是网络通信中“套接字”的概念，分为流式套接字和用户数据包套接字两种，分别对应网络的传输控制层的TCP和UDP协议。</p>
+<h3 id="2-5-Binder连接池"><a href="#2-5-Binder连接池" class="headerlink" title="2.5 Binder连接池"></a>2.5 Binder连接池</h3><p>由于一般每使用一个AIDL就需要创建一个Service，而当项目很大时，创建很多个Service的话会消耗很多资源，所以最好将所有的AIDL放在同一个Service中去管理。</p>
+<blockquote>
+<p><strong>整个工作机制是：</strong>每个业务模块创建自己的AIDL接口并实现此接口，这个时候不同业务模块之间是不能有耦合的，所有实现细节我们要单独开来，然后向服务端提供自己的唯一标识和其对应的Binder对象；对于服务端来说，只需要一个Service，服务端提供一个queryBinder接口，这个接口能够根据业务模块的特征来返回相应的Binder对象给它们，不同的业务模块拿到所需的Binder对象后就可以进行远程方法调用了。</p>
+</blockquote>
+<p><strong>Binder连接池的主要作用就是将每个业务模块的Binder请求统一转发到远程Service去执行，从而避免了重复创建Service的过程。</strong><br><img src="http://7xigjz.com1.z0.glb.clouddn.com/binder%E8%BF%9E%E6%8E%A5%E6%B1%A0%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86.jpg" alt="Binder连接池工作原理"></p>
+<h3 id="2-6-选用合适的IPC方式"><a href="#2-6-选用合适的IPC方式" class="headerlink" title="2.6 选用合适的IPC方式"></a>2.6 选用合适的IPC方式</h3><p><img src="http://7xigjz.com1.z0.glb.clouddn.com/IPC%E6%96%B9%E5%BC%8F%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9%E5%92%8C%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF.jpg" alt="IPC方式的优缺点和适用场景"></p>
+<p>另附，另外比较全面介绍Binder的相关文章:</p>
+<ul>
+<li><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/luoshengyang/article/details/6618363" >Android进程间通信（IPC）机制Binder简要介绍和学习计划<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/38461079" >Android aidl Binder框架浅析-鸿洋<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/47017485" >Android 基于Message的进程间通信 Messenger完全解析-鸿洋<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+<p>&lt;完&gt;</p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">#Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2016/07/13/art-of-android-development-chapter-3/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android 开发艺术探索笔记-3.View的事件体系</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/07/07/art-of-android-development-chapter-1/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android开发艺术探索笔记-1.Activity的生命周期和启动模式</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

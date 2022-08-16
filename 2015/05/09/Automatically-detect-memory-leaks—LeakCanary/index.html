@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            内存泄露自动探测神器——LeakCanary |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">内存泄露自动探测神器——LeakCanary</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2015-05-09 20:20:26</span>
+        <span class="mobile">2015-05-09 20:20</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/LeakCanary/">LeakCanary</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>今天刷微博，发现各位Android开源大神都在转发一条关于Square开源的自动探测内存泄露库LeakCanary的信息。<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/150509weibo-oom.png"><br>自动探测内存泄露，这也太牛逼了吧！进入@扔物线110 分享的链接了解了下，对原文作简单翻译：(翻译水平有限，凑合看吧-_-)</p>
+<span id="more"></span>
+
+<p>原文：<a class="link"   target="_blank" rel="noopener" href="https://corner.squareup.com/2015/05/leak-canary.html" >https://corner.squareup.com/2015/05/leak-canary.html<i class="fas fa-external-link-alt"></i></a><br>LeakCanary开源库地址：<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary" >https://github.com/square/leakcanary<i class="fas fa-external-link-alt"></i></a></p>
+<p>LeakCanary:探测所有内存泄露！</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">java.lang.OutOfMemoryError</span><br><span class="line">        at android.graphics.Bitmap.nativeCreate(Bitmap.java:-2)</span><br><span class="line">        at android.graphics.Bitmap.createBitmap(Bitmap.java:689)</span><br><span class="line">        at com.squareup.ui.SignView.createSignatureBitmap(SignView.java:121)</span><br></pre></td></tr></table></figure>
+<p>没有人喜欢OOM错误的出现</p>
+<p>在Square Register应用中，我们实现在一个位图缓存bitmap cache中让客户签名<a class="link"   target="_blank" rel="noopener" href="https://corner.squareup.com/2010/07/smooth-signatures.html" >draw the customer’s signature<i class="fas fa-external-link-alt"></i></a>，这个bitmap占据设备屏幕的大小，当我们创建一个bitmap时，会出现一个很严重的OOM问题。<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/150509signature.png"></p>
+<p>我们试过几种方法，但是没有一种可以解决这个问题：</p>
+<ul>
+<li>使用 Bitmap.Config.ALPHA_8 (一种不需要颜色的签名)</li>
+<li>捕捉OOM错误，触发GC，并重试几次(由<a class="link"   target="_blank" rel="noopener" href="https://android.googlesource.com/platform/packages/inputmethods/LatinIME/+/ics-mr1/java/src/com/android/inputmethod/latin/Utils.java" >GCUtils<i class="fas fa-external-link-alt"></i></a>想起的)</li>
+<li>我们并不打算脱离Java heap分配位图内存。对于我们幸运的是，开源图片处理库Fresco至今不存在这个问题</li>
+</ul>
+<p><strong>其实，我们一直以一个错误的方式思考这个问题了</strong><br>这个bitmap的尺寸不是问题所在。当内存几乎满时，OOM随时会发生。OOM常会发生在你创建大对象如bitmap的地方。OOM出现是一个更深层次问题内存泄露的征兆。</p>
+<p>###<strong>什么是内存泄露(memory leak)？</strong><br>一些对象有有限的使用期，当它们的工作完成后，它们预期会被当作内存垃圾回收。如果一个持有对象的引用链结束了它的预期寿命，这将会产生一个内存泄露。随着泄露的积累，应用程序将会耗尽内存。<br>例如，Activity的onDestroy()被调用后，这个Activity的视图层次和相关的位图都应该进行垃圾回收。而如果一个线程在后台运行这个Activity的引用，那么相应的内存将不能被回收，这最终就导致了OutOfMemoryError的出现。</p>
+<p>###<strong>搜寻内存泄露(memory leaks)</strong><br>搜寻内存泄露是一个手动过程，在Raizlabs上的<a class="link"   target="_blank" rel="noopener" href="http://www.raizlabs.com/dev/2014/03/wrangling-dalvik-memory-management-in-android-part-1-of-2/" >Wrangling Dalvik<i class="fas fa-external-link-alt"></i></a>系列文章中得到很好的描述。</p>
+<p>这里是关键步骤：</p>
+<ul>
+<li>通过<a class="link"   target="_blank" rel="noopener" href="https://bugsnag.com/" >Bugsnag<i class="fas fa-external-link-alt"></i></a>, <a class="link"   target="_blank" rel="noopener" href="https://try.crashlytics.com/" >Crashlytics<i class="fas fa-external-link-alt"></i></a>或Google的<a class="link"   target="_blank" rel="noopener" href="https://play.google.com/apps/publish/" >Developer Console<i class="fas fa-external-link-alt"></i></a>了解OOM问题;</li>
+<li>尝试重现问题。你需要想尽办法找到出现内存泄露的设备(You might need to buy, borrow, or steal the specific device that suffered the crash.) 不是所有设备都有内存泄露问题。或者你也需要自己制作内存泄露。</li>
+<li>当OOM出现时进行堆转储(dump the heap);</li>
+<li>使用MAT或YourKit内存检测工具检测内存的变化，并找出哪个对象应该被垃圾回收;</li>
+<li>从那个对象到GC roots推断最短的强引用路径;</li>
+<li>在路径中找出不存在的引用，并修复memory leak;</li>
+<li>要是有一个库能够在程序出现OOM前做这些检测，让你专注于解决内存泄露，那该多好呀？<br>(注：好，LeakCanary正能做到！)</li>
+</ul>
+<p>###<strong>LeakCanary的介绍</strong><br><a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary" >LeakCanary<i class="fas fa-external-link-alt"></i></a>是一个在调试时就可以检测内存泄露的Java开源库。</p>
+<p>看个cat类的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Cat</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Box</span> &#123;</span><br><span class="line">  Cat hiddenCat;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Docker</span> &#123;</span><br><span class="line">  <span class="keyword">static</span> Box container;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line"><span class="type">Box</span> <span class="variable">box</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Box</span>();</span><br><span class="line"><span class="type">Cat</span> <span class="variable">schrodingerCat</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Cat</span>();</span><br><span class="line">box.hiddenCat = schrodingerCat;</span><br><span class="line">Docker.container = box;</span><br></pre></td></tr></table></figure>
+<p>创建一个Refwatcher的实例并传入一个Cat对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// We expect schrodingerCat to be gone soon (or not), let&#x27;s watch it.</span></span><br><span class="line">refWatcher.watch(schrodingerCat);</span><br></pre></td></tr></table></figure>
+<p>当泄露被检测到时，可以自动地获取到泄露的地方：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">* GC ROOT static Docker.container</span><br><span class="line">* references Box.hiddenCat</span><br><span class="line">* leaks Cat instance</span><br></pre></td></tr></table></figure>
+<p>我们知道你正忙着写功能，所以我们使LeakCanary更容易地设置。只用一行代码，LeakCanary就可以自动检测活跃的泄露。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ExampleApplication</span> <span class="keyword">extends</span> <span class="title class_">Application</span> &#123;</span><br><span class="line">  <span class="meta">@Override</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">super</span>.onCreate();</span><br><span class="line">    LeakCanary.install(<span class="built_in">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当内存不足时，会有一个通知和良好的展示界面：</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/150509leaktrace.png"></p>
+<p>###<strong>总结：</strong><br>使用LeakCanary后，我们在我们的app中发现并修复了很多内存泄露问题，我们甚至发现了一些<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary/blob/master/library/leakcanary-android/src/main/java/com/squareup/leakcanary/AndroidExcludedRefs.java" >Android SDK自身的内存泄露<i class="fas fa-external-link-alt"></i></a>。<br>有了LeakCanary的结果是惊人的，我们现在减少了94%的OOM错误。<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/150509oom_rate.png"><br>如果你想消除OOM引起的崩溃，[现在就安装LeakCanary吧](If you want to eliminate OOM crashes, install LeakCanary now!)！</p>
+<p>注：搜索资料时，发现<a class="link"   target="_blank" rel="noopener" href="https://news.ycombinator.com/item?id=9513242" >Hacker News<i class="fas fa-external-link-alt"></i></a>和<a class="link"   target="_blank" rel="noopener" href="http://www.reddit.com/r/androiddev/comments/35bb3w/leakcanary/" >reddit<i class="fas fa-external-link-alt"></i></a>上开发者对LeakCanary满满的赞言，Square(电子现金支付公司)确实是非常棒的一家公司，Github上有很多优秀的开源项目，如<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/okhttp" >okhttp<i class="fas fa-external-link-alt"></i></a>, <a class="link"   target="_blank" rel="noopener" href="https://github.com/square/dagger" >dagger<i class="fas fa-external-link-alt"></i></a>, <a class="link"   target="_blank" rel="noopener" href="https://github.com/square/picasso" >picasso<i class="fas fa-external-link-alt"></i></a>, <a class="link"   target="_blank" rel="noopener" href="https://github.com/square/otto" >otto<i class="fas fa-external-link-alt"></i></a>, <a class="link"   target="_blank" rel="noopener" href="https://github.com/square/retrofit" >retrofit<i class="fas fa-external-link-alt"></i></a>等。技术型驱动的公司就是赞！</p>
+<p>第一次翻译才知道自己的英语有多渣o(╯□╰)o, 做技术的，英语水平低确实是一个瓶颈，好好加油吧！</p>
+<p>From:cfanr, 转载需声明出处：<a href="http://navyifanr.github.io/2015/05/09/Automatically-detect-memory-leaks%E2%80%94LeakCanary/">http://navyifanr.github.io/2015/05/09/Automatically-detect-memory-leaks%E2%80%94LeakCanary/</a></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/LeakCanary/">#LeakCanary</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2015/05/09/LeakCanary-project/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">LeakCanary开源项目</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2015/05/03/a-basic-understanding-of-android-dependency-injection/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">简单了解Android的依赖注入</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

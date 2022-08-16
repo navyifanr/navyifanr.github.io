@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            LeakCanary开源项目 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">LeakCanary开源项目</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2015-05-09 22:51:09</span>
+        <span class="mobile">2015-05-09 22:51</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/LeakCanary/">LeakCanary</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>Square开源了一个内存泄露自动探测神器——<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary" >LeakCanary<i class="fas fa-external-link-alt"></i></a>，它是一个Android和Java的内存泄露检测库，可以大幅度减少了开发中遇到的OOM问题，对于开发者来说，无疑是个福音，下面对该库的<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary/blob/master/README.md" >readme<i class="fas fa-external-link-alt"></i></a>进行简单的翻译:</p>
+<p>“A small leak will sink a great ship.” - Benjamin Franklin<br>小漏不补沉大船。——本杰明 富兰克林</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/150509screenshot.png"></p>
+<span id="more"></span>
+
+<p>##Getting started</p>
+<p>在项目的build.gradle文件添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">  debugCompile &#x27;com.squareup.leakcanary:leakcanary-android:1.3&#x27;</span><br><span class="line">  releaseCompile &#x27;com.squareup.leakcanary:leakcanary-android-no-op:1.3&#x27;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在Application类添加：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class ExampleApplication extends Application &#123;</span><br><span class="line"></span><br><span class="line">  @Override public void onCreate() &#123;</span><br><span class="line">    super.onCreate();</span><br><span class="line">    LeakCanary.install(this);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当在你的debug构建过程中出现内存泄露时，LeakCanary将会自动展示一个通知栏。</p>
+<p>##为什么我应该使用LeakCanary？</p>
+<p>问得好！我们正好写了个<a class="link"   target="_blank" rel="noopener" href="https://corner.squareup.com/2015/05/leak-canary.html" >博客<i class="fas fa-external-link-alt"></i></a>回答这个问题。</p>
+<p>##那怎么使用它呢？</p>
+<p>使用一个RefWatcher观察引用什么时候应该被GC：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">RefWatcher refWatcher = &#123;...&#125;;</span><br><span class="line"></span><br><span class="line">// We expect schrodingerCat to be gone soon (or not), let&#x27;s watch it.</span><br><span class="line">refWatcher.watch(schrodingerCat);</span><br></pre></td></tr></table></figure>
+<p>LeakCanary.install() 返回一个先前配置的RefWatcher，它也安装一个ActivityRefWatcher以便在Activity.onDestroy()被调用后自动检测Activity是否出现泄露。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class ExampleApplication extends Application &#123;</span><br><span class="line"></span><br><span class="line">  public static RefWatcher getRefWatcher(Context context) &#123;</span><br><span class="line">    ExampleApplication application = (ExampleApplication) context.getApplicationContext();</span><br><span class="line">    return application.refWatcher;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  private RefWatcher refWatcher;</span><br><span class="line"></span><br><span class="line">  @Override public void onCreate() &#123;</span><br><span class="line">    super.onCreate();</span><br><span class="line">    refWatcher = LeakCanary.install(this);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>你可以使用RefWatcher观察Fragment的内存泄露</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public abstract class BaseFragment extends Fragment &#123;</span><br><span class="line"></span><br><span class="line">  @Override public void onDestroy() &#123;</span><br><span class="line">    super.onDestroy();</span><br><span class="line">    RefWatcher refWatcher = ExampleApplication.getRefWatcher(getActivity());</span><br><span class="line">    refWatcher.watch(this);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>##How does it work?</p>
+<p>1.RefWatcher.watch()创建一个<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary/blob/master/library/leakcanary-watcher/src/main/java/com/squareup/leakcanary/KeyedWeakReference.java" >KeyedWeakReference<i class="fas fa-external-link-alt"></i></a>去检测对象；<br>2.接着，在后台线程，它将会检查是否有引用在不是GC触发的情况下需要被清除的；<br>3.如果引用引用仍然没有被清除，将会转储堆到.hprof文件到系统文件中(it them dumps the heap into a .hprof file stored on the app file system.)<br>4.HeapAnalyzerService是在一个分离的进程中开始的，HeapAnalyzer通过使用<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/haha" >HAHA<i class="fas fa-external-link-alt"></i></a>解析heap dump;<br>5.由于一个特殊的引用key和定位的泄露引用，HeapAnalyzer可以在heap dump中找到KeyedWeakReference；<br>6.如果有一个泄露，HeapAnalyzer计算到GC Roots的最短的强引用路径，然后创建造成泄露的引用链；<br>7.结果在app的进程中传回到DisplayLeakService，并展示泄露的通知消息；</p>
+<p>##怎样拷贝leak trace?</p>
+<p>你可以在Logcat上看leak trace:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">In com.example.leakcanary:1.0:1 com.example.leakcanary.MainActivity has leaked:</span><br><span class="line">* GC ROOT thread java.lang.Thread.&lt;Java Local&gt; (named &#x27;AsyncTask #1&#x27;)</span><br><span class="line">* references com.example.leakcanary.MainActivity$3.this$0 (anonymous class extends android.os.AsyncTask)</span><br><span class="line">* leaks com.example.leakcanary.MainActivity instance</span><br><span class="line"></span><br><span class="line">* Reference Key: e71f3bf5-d786-4145-8539-584afaecad1d</span><br><span class="line">* Device: Genymotion generic Google Nexus 6 - 5.1.0 - API 22 - 1440x2560 vbox86p</span><br><span class="line">* Android Version: 5.1 API: 22</span><br><span class="line">* Durations: watch=5086ms, gc=110ms, heap dump=435ms, analysis=2086ms</span><br></pre></td></tr></table></figure>
+
+<p>你也可以分享leak trace和heap dump文件通过action bar的菜单。</p>
+<p>##My leak is caused by the SDK implementation!</p>
+<p>随着时间过去越来越多熟知的内存泄露问题被制造商在android开源项目中修复。当这样一个泄露发生时，你能作为一个应用程序开发员来修复它。出于这个原因，LeakCanary有一个内置Android泄露的列表<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary/blob/master/library/leakcanary-android/src/main/java/com/squareup/leakcanary/AndroidExcludedRefs.java" >AndroidExcludedRefs.java<i class="fas fa-external-link-alt"></i></a>来监测它，如果你找到一个新的泄露，请用leaktrace创建一个<a class="link"   target="_blank" rel="noopener" href="https://github.com/square/leakcanary/issues/new" >issue<i class="fas fa-external-link-alt"></i></a>,标明设备和Android版本。如果你提供一个heap dump的文件链接就更好了。</p>
+<p>这是对于新发布的Android版本来说是特别重要的。你有机会更早地帮助检测新的内存泄露，这有益于整个Android社区。<br>开发版快照可以通过<a class="link"   target="_blank" rel="noopener" href="https://oss.sonatype.org/content/repositories/snapshots/" >Sonatype’s snapshots repository<i class="fas fa-external-link-alt"></i></a>找到。</p>
+<p>##Beyond the leak trace</p>
+<p>有时leak trace不够清晰，你需要使用<a class="link"   target="_blank" rel="noopener" href="http://eclipse.org/mat/" >MAT<i class="fas fa-external-link-alt"></i></a>和<a class="link"   target="_blank" rel="noopener" href="https://www.yourkit.com/" >YourKit<i class="fas fa-external-link-alt"></i></a>深入研究heap dump。这里教你怎样在head dump找到泄露的实例：</p>
+<p>1.找出包com.squareup.leakcanary.KeyedWeakReference下所有实例;<br>2.对于每个实例，考虑它的key域;<br>3.找到 KeyedWeakReference 有一个key域等于被LeakCanary报出的引用的key;<br>4.KeyedWeakReference的referent域是程序中内存泄露的对象；<br>5.从那时起，问题就转到你的手上了。一个好的开始是找到最短的GC roots的路径(排除弱引用)</p>
+<p>##自定义Customizing</p>
+<p>###图标和标签 Icon and label</p>
+<p>DisplayLeakActivity自带一个默认的icon和label，可以通过提供的R.drawable.__leak_canary_icon和R.string.__leak_canary_display_activity_label来修改：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">res/</span><br><span class="line">  drawable-hdpi/</span><br><span class="line">    __leak_canary_icon.png</span><br><span class="line">  drawable-mdpi/</span><br><span class="line">    __leak_canary_icon.png</span><br><span class="line">  drawable-xhdpi/</span><br><span class="line">    __leak_canary_icon.png</span><br><span class="line">  drawable-xxhdpi/</span><br><span class="line">    __leak_canary_icon.png</span><br><span class="line">  drawable-xxxhdpi/</span><br><span class="line">    __leak_canary_icon.png</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;resources&gt;</span><br><span class="line">  &lt;string name=&quot;__leak_canary_display_activity_label&quot;&gt;MyLeaks&lt;/string&gt;</span><br><span class="line">&lt;/resources&gt;</span><br></pre></td></tr></table></figure>
+
+<p>###储存leak traces<br>DisplayLeakActivity可以在你的app目录保存7个heap dumps和leak traces，你可以在app中通过提供R.integer.__leak_canary_max_stored_leaks的值改变这个数量：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;resources&gt;</span><br><span class="line">  &lt;integer name=&quot;__leak_canary_max_stored_leaks&quot;&gt;20&lt;/integer&gt;</span><br><span class="line">&lt;/resources&gt;</span><br></pre></td></tr></table></figure>
+
+<p>###上传到服务器<br>你可以改变默认的行为去上传leak trace并heap dump到你选择的服务器。<br>创建你自己的AbstractAnalysisResultService，最容易的方式是在你debug的源码中继承DefaultAnalysisResultService：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class LeakUploadService extends DefaultAnalysisResultService &#123;</span><br><span class="line">  @Override protected void afterDefaultHandling(HeapDump heapDump, AnalysisResult result, String leakInfo) &#123;</span><br><span class="line">    if (!result.leakFound || result.excludedLeak) &#123;</span><br><span class="line">      return;</span><br><span class="line">    &#125;</span><br><span class="line">    myServer.uploadLeakBlocking(heapDump.heapDumpFile, leakInfo);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>确定在你正式发布的Application类中使RefWatcher失效：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">public class ExampleApplication extends Application &#123;</span><br><span class="line"></span><br><span class="line">  public static RefWatcher getRefWatcher(Context context) &#123;</span><br><span class="line">    ExampleApplication application = (ExampleApplication) context.getApplicationContext();</span><br><span class="line">    return application.refWatcher;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  private RefWatcher refWatcher;</span><br><span class="line"></span><br><span class="line">  @Override public void onCreate() &#123;</span><br><span class="line">    super.onCreate();</span><br><span class="line">    refWatcher = installLeakCanary();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  protected RefWatcher installLeakCanary() &#123;</span><br><span class="line">    return RefWatcher.DISABLED;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在你的debug的Application类创建一个定制的RefWatcher：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class DebugExampleApplication extends ExampleApplication &#123;</span><br><span class="line">  protected RefWatcher installLeakCanary() &#123;</span><br><span class="line">    return LeakCanary.install(app, LeakUploadService.class);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>不要忘记了在你debug的manifest中注册service:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;manifest xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot;</span><br><span class="line">    &gt;</span><br><span class="line">  &lt;application android:name=&quot;com.example.DebugExampleApplication&quot;&gt;</span><br><span class="line">    &lt;service android:name=&quot;com.example.LeakUploadService&quot; /&gt;</span><br><span class="line">  &lt;/application&gt;</span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/150509icon_512.png"></p>
+<p>译者：cfanr</p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/LeakCanary/">#LeakCanary</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2015/05/25/The-simple-analysis-of-Startup-News-App-source-code/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Startup News App源码简单分析</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2015/05/09/Automatically-detect-memory-leaks%E2%80%94LeakCanary/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">内存泄露自动探测神器——LeakCanary</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android 开发艺术探索笔记-3.View的事件体系 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android 开发艺术探索笔记-3.View的事件体系</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-07-13 23:53:12</span>
+        <span class="mobile">2016-07-13 23:53</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="3-1-View基础知识"><a href="#3-1-View基础知识" class="headerlink" title="3.1 View基础知识"></a>3.1 View基础知识</h3><p>1.View是所以控件的基类，ViewGroup也属于View</p>
+<p>2.View的位置参数<br>由top、left、right、bottom，左上角和右下角的横纵坐标决定（相对View的父容器）。<br>Android3.0开始增加了几个参数：左上角坐标x和y、左上角相对父容器的偏移量translationX和translationY（默认值为0）<br>x &#x3D; left + translationX<br>y &#x3D; top + translationY<br>平移时，top、left不会发生改变，始终为原始坐标</p>
+<span id="more"></span>
+
+<p>3.MotionEvent和TouchSlop<br>MotionEvent事件类型：<br>ACTION_DOWN——手指刚接触屏幕<br>ACTION_MOVE——手指在屏幕上移动<br>ACTION_UP——手从屏幕上松开的一瞬间<br>通过MotionEvent可以获取x、y坐标，有两种方法：a.getX和getY，返回相对于当前View左上角x、y坐标；b.getRaw和getRawY，返回相对于手机屏幕左上角的x、y坐标</p>
+<p>TouchSlop是系统所能识别出被认为是滑动的最小距离。可以通过如下方式获取该值：ViewConfiguration.get(getContext()).getScaledTouchSlop()</p>
+<p>4.VelocityTracker<br>用于追踪手指在滑动过程中的速度，包括水平和垂直方向的速度。在View的onTouchEvent方法中追踪单击事件速度方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">VelocityTracker</span> <span class="variable">mVelocityTracker</span> <span class="operator">=</span> VelocityTracker.obtain();  <span class="comment">//初始化</span></span><br><span class="line">mVelocityTracker.addMovement(event);</span><br><span class="line">mVelocityTracker.computeCurrentVelocity(<span class="number">1000</span>);</span><br><span class="line"><span class="type">float</span> <span class="variable">xVelocity</span> <span class="operator">=</span> mVelocityTracker.getXVelocity();  <span class="comment">//获取速度</span></span><br></pre></td></tr></table></figure>
+
+<p>5.GestureDetector<br>手势检测，用于辅助检测用户的单击、滑动、长按、双击等行为。作者建议：<strong>如果只是监听滑动相关的事件在onTouchEvent中实现；如果要监听双击这种行为的话，那么就使用GestureDetector。</strong></p>
+<p>6.Scroller<br><strong>弹性滑动对象，用于实现View的弹性滑动</strong>。当使用View的scrollTo&#x2F;scrollBy方法滑动时，是瞬间完成的，没有过渡效果，滑动体验不好，所以一般会用Scroller来实现由过渡的滑动。<br>Scroller本身不能让View弹性滑动，它需要和View的computeScroll方法配合使用才能共同完成这个功能</p>
+<h3 id="3-2-View的滑动"><a href="#3-2-View的滑动" class="headerlink" title="3.2 View的滑动"></a>3.2 View的滑动</h3><p><strong>有三种方法可以实现View的滑动</strong>：a.通过View本身的scrollTo&#x2F;scrollBy方法；b.通过动画给View施加平移来实现滑动；c.改变View的LayoutParams使View重新布局实现滑动。</p>
+<p>1.scrollTo&#x2F;scrollBy<br><strong>只能改变view内容的位置而不能改变view在布局中的位置。</strong>scrollBy是基于当前位置的相对滑动，而scrollTo是基于所传参数的绝对滑动。可以通过View的getScrollX和getScrollY方法可以得到滑动的距离。</p>
+<p>2.使用动画<br>主要是操作View的translationX和translationY属性，可以使用传统动画和属性动画（兼容3.0以下系统时，需要用到开源库nineoldandroids）。不过注意：<strong>3.0以下，view动画和属性动画，新位置均无法触发点击事件，同时，老位置仍然可以触发单击事件。从3.0之后，属性动画的单击事件触发位置为移动后的位置，view动画仍然在原位置。</strong></p>
+<p>3.改变布局参数<br>即改变LayoutParams，如使Button右移100px，可以设置它的marginLeft增加100px或在它左边设置一个空view，动态控制它的宽度变化(两者父容器为LinearLayout)：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">MarginLayoutParams</span> <span class="variable">param</span> <span class="operator">=</span> (MarginLayoutParams) button.getLayoutParams();</span><br><span class="line">param.width += <span class="number">100</span>;</span><br><span class="line">param.leftMargin += <span class="number">100</span>;</span><br><span class="line">button.requestLayout();</span><br><span class="line"><span class="comment">//或button.setLayoutParams(param)</span></span><br></pre></td></tr></table></figure>
+
+<p>总结：<br>scrollTo&#x2F;scrollBy：操作简单，适合对View内容的滑动；<br>动画：操作简单，主要适用于没有交互的View和实现复杂的动画效果；<br>改变布局参数：操作稍微复杂，适用于有交互的View</p>
+<h3 id="3-3-弹性滑动"><a href="#3-3-弹性滑动" class="headerlink" title="3.3 弹性滑动"></a>3.3 弹性滑动</h3><p>1.使用Scroller<br>工作原理：<strong>Scroller本身并不能实现View的滑动，它需要配合View的computeScroll方法才能完成弹性滑动的效果，它不断让View重绘，而每一次重绘距滑动起始时间会有一个时间间隔，通过这个时间间隔Scroller就可以得出View当前的滑动位置，然后可以通过scrollTo方法完成View的滑动。View的每一次重绘导致View进行小幅度的滑动，多次小幅度的滑动组成弹性滑动。</strong></p>
+<p>2.通过动画<br>利用动画在onAnimationUpdate方法获取fraction的动态值设置scrollTo实现弹性</p>
+<p>3.使用延时策略<br>通过发送一系列延时消息从而达到渐进式变化。可以使用Handler的sendEmptyMessageDelayed(xxx)或view的postDelayed方法，也可以使用线程的sleep方法。</p>
+<h3 id="3-4-View的事件分发机制"><a href="#3-4-View的事件分发机制" class="headerlink" title="3.4 View的事件分发机制"></a>3.4 View的事件分发机制</h3><p>参考：<a class="link"   target="_blank" rel="noopener" href="http://hanhailong.com/2015/09/24/Android-%E4%B8%89%E5%BC%A0%E5%9B%BE%E6%90%9E%E5%AE%9ATouch%E4%BA%8B%E4%BB%B6%E4%BC%A0%E9%80%92%E6%9C%BA%E5%88%B6/" >Android-三张图搞定Touch事件传递机制<i class="fas fa-external-link-alt"></i></a></p>
+<p>View不处理事件流程图（View没有消费事件）<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/view%E4%B8%8D%E5%A4%84%E7%90%86%E4%BA%8B%E4%BB%B6.png" alt="View不处理事件"></p>
+<p>View处理事件<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/view%E5%A4%84%E7%90%86%E4%BA%8B%E4%BB%B6.png" alt="View处理事件"></p>
+<p>事件拦截<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/view-dispatch-event.png" alt="事件拦截"></p>
+<h3 id="3-5-View的滑动冲突"><a href="#3-5-View的滑动冲突" class="headerlink" title="3.5 View的滑动冲突"></a>3.5 View的滑动冲突</h3><p>1.常见的滑动冲突<br>a.外部滑动方向和内部不一致<br>b.外部滑动方向和内部一致<br>c.上面两种的嵌套</p>
+<p>2.冲突处理规则<br>可以依据滑动路径和水平方向所形成的夹角；可以依据水平方向和竖直方向的距离差，或依据水平和竖直方向的速度差做判断</p>
+<p>3.滑动冲突解决方式<br>a.<strong>外部拦截法，即点击事件都先经过父容器的拦截处理，如果父容器需要此事件就拦截，如果不需要就不拦截。该方法需要重写父容器的onInterceptTouchEvent方法，在内部做相应的拦截即可，其他均不需要做修改。</strong>伪代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onInterceptTouchEvent</span><span class="params">(MotionEvent event)</span> &#123;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">intercepted</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> (<span class="type">int</span>) event.getX();</span><br><span class="line">    <span class="type">int</span> <span class="variable">y</span> <span class="operator">=</span> (<span class="type">int</span>) event.getY();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (event.getAction()) &#123;</span><br><span class="line">	    <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">	        intercepted = <span class="literal">false</span>;</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">	    <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">	        <span class="type">int</span> <span class="variable">deltaX</span> <span class="operator">=</span> x - mLastXIntercept;</span><br><span class="line">	        <span class="type">int</span> <span class="variable">deltaY</span> <span class="operator">=</span> y - mLastYIntercept;</span><br><span class="line">	        <span class="keyword">if</span> (父容器需要拦截当前点击事件的条件，例如：Math.abs(deltaX) &gt; Math.abs(deltaY)) &#123;</span><br><span class="line">	            intercepted = <span class="literal">true</span>;</span><br><span class="line">	        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	            intercepted = <span class="literal">false</span>;</span><br><span class="line">	        &#125;</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">	    <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">	        intercepted = <span class="literal">false</span>;</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">	    <span class="keyword">default</span>:</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mLastXIntercept = x;</span><br><span class="line">    mLastYIntercept = y;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> intercepted;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a class="link"   target="_blank" rel="noopener" href="https://github.com/singwhatiwanna/android-art-res/blob/master/Chapter_3/src/com/ryg/chapter_3/ui/HorizontalScrollViewEx.java" >书中示例代码<i class="fas fa-external-link-alt"></i></a></p>
+<p>b.<strong>内部拦截法，即父容器不拦截任何事件，所有的事件都传递给子元素，如果子元素需要此事件就直接消耗掉，否则就交给父容器来处理。这种方法和Android中的事件分发机制不一致，需要配合requestDisallowInterceptTouchEvent方法才能正常工作。</strong>伪代码如下，需要重写子元素的dispatchTouchEvent方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">dispatchTouchEvent</span><span class="params">(MotionEvent event)</span> &#123;</span><br><span class="line">    <span class="type">int</span> <span class="variable">x</span> <span class="operator">=</span> (<span class="type">int</span>) event.getX();</span><br><span class="line">    <span class="type">int</span> <span class="variable">y</span> <span class="operator">=</span> (<span class="type">int</span>) event.getY();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span> (event.getAction()) &#123;</span><br><span class="line">	    <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">	        getParent().requestDisallowInterceptTouchEvent(<span class="literal">true</span>);</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">	    <span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line">	        <span class="type">int</span> <span class="variable">deltaX</span> <span class="operator">=</span> x - mLastX;</span><br><span class="line">	        <span class="type">int</span> <span class="variable">deltaY</span> <span class="operator">=</span> y - mLastY;</span><br><span class="line">	        <span class="keyword">if</span> (当前view需要拦截当前点击事件的条件，例如：Math.abs(deltaX) &gt; Math.abs(deltaY)) &#123;</span><br><span class="line">	            getParent().requestDisallowInterceptTouchEvent(<span class="literal">false</span>);</span><br><span class="line">	        &#125;</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">	    <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">	    <span class="keyword">default</span>:</span><br><span class="line">	        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    mLastX = x;</span><br><span class="line">    mLastY = y;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">super</span>.dispatchTouchEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><a class="link"   target="_blank" rel="noopener" href="https://github.com/singwhatiwanna/android-art-res/blob/master/Chapter_3/src/com/ryg/chapter_3/ui/ListViewEx.java" >书中示例代码<i class="fas fa-external-link-alt"></i></a></p>
+<p>附：<a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/sunzn/archive/2013/05/10/3064129.html" >Android 编程下 Touch 事件的分发和消费机制<i class="fas fa-external-link-alt"></i></a></p>
+<p>The end.</p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">#Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2016/07/15/art-of-android-development-chapter-4/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android 开发艺术探索笔记-4.View的工作原理</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/07/10/art-of-android-development-chapter-2/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android开发艺术探索笔记-2.IPC机制</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

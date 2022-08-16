@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android开发艺术探索笔记-1.Activity的生命周期和启动模式 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android开发艺术探索笔记-1.Activity的生命周期和启动模式</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-07-07 21:32:10</span>
+        <span class="mobile">2016-07-07 21:32</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="1-1Activity生命周期全面分析"><a href="#1-1Activity生命周期全面分析" class="headerlink" title="1.1Activity生命周期全面分析"></a>1.1Activity生命周期全面分析</h3><p><img src="http://7xigjz.com1.z0.glb.clouddn.com/activity-lifecycle.png" alt="activity lifecycle"></p>
+<ul>
+<li>onCreate(), 加载界面布局资源，初始化Activity需要的数据等</li>
+<li>onStart(), Activity已经是可见状态，但未出现在前台，无法与用户交互；</li>
+<li>onResume(), Activity已经可见，处于前台，所以一般如果需要返回页面自动刷新数据时，将请求的方法放在onResume;</li>
+<li>onPause(), 不能做太耗时的操作，<strong>onPause必须执行完，新的Activity才会启动</strong>，也就是说ActivityA跳转到ActivityB，执行顺序: ……A:onPause()-&gt;B:onCreate()-&gt;B:onStart()-&gt;B:onResume()-&gt;A:onStop()</li>
+<li>onStop(), Activity不可见时会调用，所以<strong>当新的Activity采用透明主题时，当前Activity不会调用onStop()</strong>;</li>
+<li>onDestroy(), 回收资源，取消注册广播等；</li>
+</ul>
+<p>onStart()和onStop()是从Activity<strong>是否可见</strong>来回调，而onResume()和onPause()是从Activity<strong>是否位于前台</strong>来回调。</p>
+<span id="more"></span>
+
+<p>异常情况下的生命周期，有两种:<br>1.资源相关的系统配置发生改变导致Activity被杀死并重新创建<br>如locale, 设备本地位置发生变化(一般指切换了系统语言)；keyboardHidden，键盘可访问性发生改变；orientation，屏幕方向发生改变；等<br>2.系统内存不足导致优先级低的<code>Activity</code>被杀死<br>优先级由高到低: 前台Activity &gt; 可见但非前台Activity &gt; 后台Activity<br>异常情况下系统会调用onSaveInstanceState保存当前Activity的状态(调用时机在onStop之前，但具体是onPause前后不确定)，Activity被销毁后重启会将保存的Bundle对象<strong>同时传递给onRestoreInstanceState和onCreate方法</strong>(不过建议在onRestoreInstanceState做恢复数据操作)</p>
+<h3 id="1-2-Activity的四种启动模式"><a href="#1-2-Activity的四种启动模式" class="headerlink" title="1.2 Activity的四种启动模式"></a>1.2 Activity的四种启动模式</h3><p>1.standard, 标准模式。Activity默认会进入启动它的Activity所在的任务栈中<br>2.singleTop, 栈顶复用模式。若新Activity已经位于任务栈栈顶，那么该Activity不会被重建，<strong>并且会调用onNewIntent方法(onCreate和onStart不会被调用)<strong>，若不是栈顶，Activity则会重建；<br>3.singleTask, 栈内复用模式。</strong>只要Activity在它需要的任务栈中存在，那么多次启动该Activity都不会重新创建实例(不在栈顶的会清除它上面的Activity以达到栈顶，即CLEAR_TOP功能)，和singleTop一样，系统会回调onNewIntent.</strong> 如:</p>
+<blockquote>
+<p>a.当前任务栈S1为ABC，D以singleTask启动，需要任务栈为S2(不存在)，则系统会创建S2, 然后创建D，并压入S2；<br>b.若D需要的是栈S1，则会创建D，然后入栈到S1；<br>c.若栈S1为ADBC，D需要栈S1，因为S1已经有D的实例，所以BC会出栈，变为AD；</p>
+</blockquote>
+<p>4.singleInstance, 单实例模式。加强版的singleTask, 拥有singleTask的所以特性，<strong>只能单独位于一个任务栈中，一旦创建后，除非任务栈被系统销毁，不然就不会重新创建新的Activity</strong>。</p>
+<p>注:<br>a.<strong>TaskAffinity是标识singleTask所需要的任务栈的参数</strong>，一般任务栈名为应用包名，所以TaskAffinity不能和应用包名一样。另外，任务栈分为前台和后台任务栈，后台的Activity处于暂停状态，可以切换调到前台。</p>
+<p>b.<strong>TaskAffinity和allowTaskReparenting&#x3D;true结合时，比较特殊，会发生任务栈转移</strong>，如应用A启动了应用B的ActivityC(allowTaskReparenting&#x3D;true), 当home键后再启动应用B时会进入ActivityC(任务栈有A到B)</p>
+<p>c.启动方式: 代码优先级高于manifast配置的优先级</p>
+<p>d.Activity的Flag<br>1).FLAG_ACTIVITY_NEW_TASK对应singleTask<br>2).FLAG_ACTIVITY_SINGLE_TOP对应singleTop<br>3).FLAG_ACTIVITY_CLEAR_TOP同一栈内位于它上面的Activity全部出栈，一般配合FLAG_ACTIVITY_NEW_TASK使用<br>4).FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS不会出现在Activity历史列表，等同于android:excludeFromRecents&#x3D;”true”<br>FLAG方式不能设置singleInstance模式</p>
+<h3 id="1-3IntentFilter的匹配规则"><a href="#1-3IntentFilter的匹配规则" class="headerlink" title="1.3IntentFilter的匹配规则"></a>1.3IntentFilter的匹配规则</h3><p>启动Activity方式有两种: 显式调用和隐式调用，显式调用要明确被启动的对象的包名类名，隐式调用则不需要，但要设置过滤规则。IntentFilter的过滤信息有: action, category, data。<strong>一个Activity可以有多个intent-filter, 一个Intent只要匹配一组intent-filter(必须同时匹配action、category和data)就可以成功启动Activity</strong></p>
+<ul>
+<li>action的匹配规则<br>只要Intent中的action和过滤规则中的任何一个action相同即可匹配成功，action匹配区分大小写。</li>
+<li>category匹配规则<br>Intent中如果有category，则所有的category都必须和过滤规则中的其中一个category相同，如果没有category的话那么就是默认的category, 即android.intent.category.DEFAULT, 所以为了Activity能够接收隐式调用，配置多个category的时候必须加上默认的category。</li>
+<li>data匹配规则<br>Intent中必须有data数据，并且data数据能够完全匹配过滤规则中的某一个data<br>data语法如下:<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">data</span> <span class="attr">android:scheme</span>=<span class="string">&quot;string&quot;</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:host</span>=<span class="string">&quot;string&quot;</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:port</span>=<span class="string">&quot;string&quot;</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:path</span>=<span class="string">&quot;string&quot;</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:pathPattern</span>=<span class="string">&quot;string&quot;</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:pathPrefix</span>=<span class="string">&quot;string&quot;</span> </span></span><br><span class="line"><span class="tag">        <span class="attr">android:mimeType</span>=<span class="string">&quot;string&quot;</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+data主要由mineType和URI两部分组成。mineType是媒体类型，如image&#x2F;jpeg, video&#x2F;*等，URI结构如下:<br><code>&lt;scheme&gt;://&lt;host&gt;:&lt;port&gt;/[&lt;path&gt;]|[&lt;pathPrefix&gt;]|[pathPattern]</code><br> 例如<code>content://com.example.project:200/folder/subfolder/etc</code><br>scheme、host、port分别表示URI的模式、主机名和端口号，其中如果scheme或者host未指定那么URI就无效。 path、pathPattern、pathPrefix<br>都是表示路径信息，其中path表示完整的路径信息，pathPrefix表示路径的前缀信息；pathPattern表示完整的路径，但是它里面包含了通配符(**)</li>
+</ul>
+<p>注:<br>如果过滤规则中的mimeType指定为<code>image/*</code> 或者<code>text/*</code>等这种类型的话，那么即使过滤规则中没有指定URI，URI有默认的scheme是content和file;<br><strong>当为Intent指定完整的data，必须要调用setDataAndType方法！</strong>不能先调用setData然后调用setType，因为这两个方法会彼此清除对方的值。应使用:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">intent.setDataAndType(Uri.parse(&quot;file://abc&quot;), &quot;image/png&quot;);</span><br></pre></td></tr></table></figure>
+
+<p><strong>判断是否有Activity能够匹配我们的隐式Intent的两种方法:</strong><br>1.用PackageManager的resolveActivity方法或者Intent的resolveActivity方法：如果找不到就会返回null;<br>2.用PackageManager的queryIntentActivities方法: 它返回所有成功匹配的Activity信息 针对Service和BroadcastReceiver等组件，PackageManager同样提供了类似的方法去获取成功匹配的组件信息，例如queryIntentServices、queryBroadcastReceivers等方法。<br>有一类action和category比较重要，它们在一起用来标明这是一个入口Activity，并且会出现在系统的应用列表中。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span> </span><br><span class="line">  <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.action.MAIN&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">&quot;android.intent.category.LAUNCHER&quot;</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>&lt;完&gt;</p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">#Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2016/07/10/art-of-android-development-chapter-2/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android开发艺术探索笔记-2.IPC机制</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/06/26/clear-redundancy-Java-code-toolol%E2%80%94Lombok/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android中消除Java冗长代码神器——Lombok</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

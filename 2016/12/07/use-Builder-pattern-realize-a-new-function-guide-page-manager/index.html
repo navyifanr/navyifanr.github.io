@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android用建造者模式实现一个新功能引导页 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android用建造者模式实现一个新功能引导页</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-12-07 15:46:57</span>
+        <span class="mobile">2016-12-07 15:46</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/android/">android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>最近每次版本更新都会在UI变动或加了新功能的地方加一个引导蒙层页面（新功能标记、文案和一个“知道了”的按钮），有时候一个版本会加三四个页面，原来的做法是：</p>
+<ul>
+<li>1.在每个Activity的布局文件外层添加一个FrameLayout(这方法好蠢，又要嵌套一层布局)；</li>
+<li>2.再将需要显示的引导页布局加在后面(或用include的方式);</li>
+<li>3.写两个方法，获取和设置是否显示了该引导页的判断，存储到SharedPreferences;</li>
+<li>4.最后在对应Activity页面添加对应控制引导页显隐的逻辑</li>
+</ul>
+<p>每添加一个页面就要重复上面四个步骤，而且之后版本迭代需要去掉这些冗余代码时也比较麻烦，改动的地方比较多，不利于管理。<br>这方法太笨了，不能纯粹只为了完成功能呀，于是想了一个简单有效的方法。</p>
+<span id="more"></span>
+
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/161209builder_pattern-guide_page.png" alt="新功能引导页效果图"></p>
+<p>首先解决避免改动原Activity布局的问题，只要通过findViewById(android.R.id.content)获取Activity根布局下的FrameLayout, 再将需要添加的引导页布局addView(view)进入就可以了</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">FrameLayout rootLayout = (FrameLayout) activity.findViewById(android.R.id.content);</span><br><span class="line">View layoutView = View.inflate(activity, layoutId, null);</span><br><span class="line">rootLayout.add(layoutView);</span><br></pre></td></tr></table></figure>
+<p>这样就解决了改动Activity布局的问题，同时也将引导页的内容单独放在一个Layout文件（说得好像是废话，这不是必须的吗，不过我还真看过有人将所有布局代码都放在Activity的布局文件的 o(╯□╰)o）</p>
+<p>然后后面的优化就好办了。将存储到SharedPreferences引导页是否已展示的方法增加一个pageTag的参数，通过外部使用时传入，这样就避免了每个页面都写同类型的方法的问题了。</p>
+<p>最后将上面所说的方法封装在一个类GuidePage，使用时传入activity, layoutId, knowViewId(知道了按钮)和pageTag即可，写好这个工具类后，之后再需要增加引导页时只需要：<br>1.写一个引导页面的布局；<br>2.在对应的Activity页面调用这个工具方法即可；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">apply</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="type">int</span> layoutId, <span class="meta">@IdRes</span> <span class="type">int</span> knowViewId, String pageTag)</span> &#123;</span><br><span class="line">    <span class="type">FrameLayout</span> <span class="variable">rootLayout</span> <span class="operator">=</span> (FrameLayout) activity.findViewById(android.R.id.content);</span><br><span class="line">    <span class="type">View</span> <span class="variable">layoutView</span> <span class="operator">=</span> View.inflate(activity, layoutId, <span class="literal">null</span>);</span><br><span class="line">    rootLayout.addView(layoutView);</span><br><span class="line">    layoutView.setOnTouchListener(<span class="keyword">new</span> <span class="title class_">View</span>.OnTouchListener() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onTouch</span><span class="params">(View v, MotionEvent event)</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    layoutView.findViewById(knowViewId).setOnClickListener(<span class="keyword">new</span> <span class="title class_">OnClickListener</span>() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onClick</span><span class="params">(View v)</span> &#123;</span><br><span class="line">            rootLayout.removeView(layoutView);</span><br><span class="line">            SpUtil.setHasShowedGuidePage(activity, pageTag, <span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//调用时，直接在Activity写</span></span><br><span class="line"><span class="keyword">if</span>(!SpUtil.hasShowedGuidePage())&#123;</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">GuidePage</span>(<span class="built_in">this</span>).apply(R.layout.view_home_guide_page, R.id.home_guide_page_know, pageTag);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>减少了大量重复代码，不用修改原来的布局文件，后期删除也比较方便，简单吧  -_-</p>
+<p>理论上，这样就完了，不过程序员比较喜欢折腾，这样直接在构造器写四个参数好像不太好看吧，好像可以用建造者模式改下，于是就开始了将简单的事情搞复杂的道路-_-</p>
+<p>——————————分割线————————————</p>
+<p>期待这样调用就可以了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> <span class="title class_">GuidePage</span>.Builder(<span class="built_in">this</span>)</span><br><span class="line">      .setLayoutId(R.layout.view_home_guide_page)</span><br><span class="line">      .setKnowViewId(R.id.home_guide_page_know)</span><br><span class="line">      .setPageTag(pageTag)</span><br><span class="line">      .builder()</span><br><span class="line">      .apply();</span><br></pre></td></tr></table></figure>
+<p>建造者模式有两种写法，一种是有设计者的（有序），一种是无设计者的（无序），AlertDialog是无设计者的方式，简单一点，比较喜欢这种连写的方式。不记得建造者模式的可以看篇文章回忆下：<a class="link"   target="_blank" rel="noopener" href="http://blog.qiji.tech/archives/5886" >[Android] 设计模式-建造者模式<i class="fas fa-external-link-alt"></i></a></p>
+<p>建一个GuidePage的类，里面有个Builder的内部类，通过内部类设置activity, layoutId, knowViewId等参数。存储引导页是否已展示的方法好像可以直接写在GuidePage，就不用在外部判断了，不过这样要执行一些无用的代码，不适合；还有pageTag好像可以直接用activity.getClass().getSimpleName(), 也不用传这个值了，不过如果同一个Activity有两个引导页(如不同Fragment需要不同引导页)就不适用了，还是只能通过参数传入好点</p>
+<p>好吧，这么简单，就不多说了，直接上代码:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GuidePage</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> layoutId;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> knowViewId;</span><br><span class="line">    <span class="keyword">private</span> String pageTag;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">boolean</span> <span class="variable">mCancel</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Activity activity;</span><br><span class="line">    <span class="keyword">private</span> FrameLayout rootLayout;</span><br><span class="line">    <span class="keyword">private</span> View layoutView;</span><br><span class="line">    <span class="comment">//设置为 protected或private, 不被外部直接调用</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="title function_">GuidePage</span><span class="params">()</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title class_">Builder</span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="type">GuidePage</span> <span class="variable">guidePage</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">GuidePage</span>();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="title function_">Builder</span><span class="params">(Activity activity)</span>&#123;</span><br><span class="line">            guidePage.activity = activity;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Builder <span class="title function_">setLayoutId</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="type">int</span> layoutId)</span>&#123;</span><br><span class="line">            guidePage.layoutId = layoutId;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Builder <span class="title function_">setKnowViewId</span><span class="params">(<span class="meta">@IdRes</span> <span class="type">int</span> knowViewId)</span>&#123;</span><br><span class="line">            guidePage.knowViewId = knowViewId;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 引导唯一的标记，用作存储到SharedPreferences的key值，不同引导页必须不一样</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@param</span> pageTag</span></span><br><span class="line"><span class="comment">         * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">public</span> Builder <span class="title function_">setPageTag</span><span class="params">(String pageTag)</span>&#123;</span><br><span class="line">            guidePage.pageTag = pageTag;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Builder <span class="title function_">setCloseOnTouchOutside</span><span class="params">(<span class="type">boolean</span> cancel)</span>&#123;</span><br><span class="line">            guidePage.mCancel = cancel;</span><br><span class="line">            <span class="keyword">return</span> <span class="built_in">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> GuidePage <span class="title function_">builder</span><span class="params">()</span>&#123;</span><br><span class="line">            <span class="keyword">if</span>(TextUtils.isEmpty(guidePage.pageTag))&#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(<span class="string">&quot;the guide page must set page tag&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            guidePage.setLayoutView();</span><br><span class="line">            guidePage.setKnowEvent();</span><br><span class="line">            guidePage.setCloseOnTouchOutside();</span><br><span class="line">            <span class="keyword">return</span> guidePage;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setLayoutView</span><span class="params">()</span>&#123;</span><br><span class="line">        rootLayout = (FrameLayout) activity.findViewById(android.R.id.content);</span><br><span class="line">        layoutView = View.inflate(activity, layoutId, <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setKnowEvent</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(layoutView!=<span class="literal">null</span>) &#123;</span><br><span class="line">            layoutView.findViewById(knowViewId).setOnClickListener(<span class="keyword">new</span> <span class="title class_">View</span>.OnClickListener() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onClick</span><span class="params">(View v)</span> &#123;</span><br><span class="line">                    cancel();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setCloseOnTouchOutside</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(layoutView == <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        layoutView.setOnTouchListener(<span class="keyword">new</span> <span class="title class_">View</span>.OnTouchListener() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onTouch</span><span class="params">(View v, MotionEvent event)</span> &#123;</span><br><span class="line">                <span class="keyword">if</span>(mCancel)&#123;</span><br><span class="line">                    cancel();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;  <span class="comment">//消费事件，不下发</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">apply</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(GuidePageManager.hasNotShowed(activity, pageTag))</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        rootLayout.addView(layoutView);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cancel</span><span class="params">()</span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(rootLayout!=<span class="literal">null</span> &amp;&amp; layoutView!=<span class="literal">null</span>) &#123;</span><br><span class="line">            rootLayout.removeView(layoutView);</span><br><span class="line">            GuidePageManager.setHasShowedGuidePage(activity, pageTag, <span class="literal">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面是判断页面是否显示引导页的类，或者用来定义一些静态的pageTag也行</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GuidePageManager</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">GuidePageManager</span><span class="params">()</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> activity</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> pageKey 使用时，传入的值必须和GuidePage设置的值一样</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">hasNotShowed</span><span class="params">(Activity activity, String pageKey)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> !hasShowedGuidePage(activity, pageKey);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setHasShowedGuidePage</span><span class="params">(Context context, String key, <span class="type">boolean</span> hasShowed)</span>&#123;</span><br><span class="line">        SharedPreferences settings= context.getSharedPreferences(context.getPackageName(), <span class="number">0</span>);</span><br><span class="line">        SharedPreferences.Editor editor=settings.edit();</span><br><span class="line">        editor.putBoolean(key, hasShowed);</span><br><span class="line">        editor.commit();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">hasShowedGuidePage</span><span class="params">(Context context, String key)</span>&#123;</span><br><span class="line">        SharedPreferences settings=context.getSharedPreferences(context.getPackageName(), <span class="number">0</span>);</span><br><span class="line">        <span class="type">boolean</span> value=settings.getBoolean(key, <span class="literal">false</span>);</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，使用方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(GuidePageManager.hasNotShowed(<span class="built_in">this</span>, MainActivity.class.getSimpleName()))&#123;</span><br><span class="line">    <span class="keyword">new</span> <span class="title class_">GuidePage</span>.Builder(<span class="built_in">this</span>)</span><br><span class="line">            .setLayoutId(R.layout.view_home_guide_page)</span><br><span class="line">            .setKnowViewId(R.id.btn_home_act_enter_know)</span><br><span class="line">            .setPageTag(MainActivity.class.getSimpleName())</span><br><span class="line">            .builder()</span><br><span class="line">            .apply();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Github代码: <a class="link"   target="_blank" rel="noopener" href="https://github.com/navyifanr/AndroidTrainingDemo/tree/master/GuidePageManage" >GuidePageManage<i class="fas fa-external-link-alt"></i></a></p>
+<p>完了。</p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/android/">#android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2017/01/24/solve-Android-video-guide-page-black-screen/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">ANDROID视频引导滑动黑屏扫雷以及解决方案</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/08/10/Android-Handler-AsyncTask-Thread-and-Service/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android中的Handler, AsyncTask, Thread和Service相关</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

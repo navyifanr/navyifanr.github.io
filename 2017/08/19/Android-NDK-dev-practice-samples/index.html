@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android NDK 开发：实战案例 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android NDK 开发：实战案例</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2017-08-19 10:06:21</span>
+        <span class="mobile">2017-08-19 10:06</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Android-NDK/">Android NDK</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="0-前言"><a href="#0-前言" class="headerlink" title="0. 前言"></a>0. 前言</h3><p>如果只学理论，不做实践，不踩踩坑，一般很难发现真正实践项目中的问题的，也比较难以加深对技术的理解。所以延续上篇 JNI 的实战<a class="link"   target="_blank" rel="noopener" href="http://cfanr.cn/2017/08/05/Android-NDK-dev-JNI-s-practice/" >Android NDK开发：JNI实战篇 <i class="fas fa-external-link-alt"></i></a>，这篇主要是一些 NDK 小项目的练习，由于这些项目网上都有 demo介绍，这里不会具体一步步介绍如何操作，只记录一些个人需要注意的地方或一些主要步骤，详细的介绍或代码可以点击里面的链接查看。</p>
+<h3 id="1-文件加解密和分割合并"><a href="#1-文件加解密和分割合并" class="headerlink" title="1. 文件加解密和分割合并"></a>1. 文件加解密和分割合并</h3><h4 id="1-1-简介"><a href="#1-1-简介" class="headerlink" title="1.1 简介"></a>1.1 简介</h4><p>所有文件都是二进制存储的，无论是文本，图片还是视频文件都是以二进制存储在磁盘中。所以可以通过对文件进行二进制运算进行加解密。下面用到的是比较简单的<code>^</code>异或运算来对文件加解密（算是一种对称加密算法）<br>附：加解密算法扩展：<a class="link"   target="_blank" rel="noopener" href="https://yeasy.gitbooks.io/blockchain_guide/content/crypto/algorithm.html" >加解密算法 · 区块链技术指南<i class="fas fa-external-link-alt"></i></a></p>
+<p>一般在大文件传输时，如音视频文件，会将文件分割后再传输，从而提高效率。当需要使用时，再将分割后的文件合并即可。</p>
+<p>而文件加解密设计到安全，可以使用 NDK 增加反编译的难度。另外文件的分割合并都比较耗性能，可以放到 NDK 处理提高效率。</p>
+<span id="more"></span>
+
+<p>以下练习参考：<a class="link"   target="_blank" rel="noopener" href="http://www.jianshu.com/p/4333d7ddf615" >NDK开发基础②文件加密解密与分割合并 - 简书<i class="fas fa-external-link-alt"></i></a></p>
+<p>效果图如图，进入界面会拷贝两张 assets 的图片<code>cats.jpg</code>和<code>image.jpg</code>到本地 <code>sdcard/NdkSample</code> 目录下作为测试。加密后的图片 <code>cats_encypt.jpg</code>是无法直接查看的，合成的图片是 <code>image.jpeg</code><br><img src="https://i.loli.net/2019/06/10/5cfe7344b2e7f46208.png" alt="效果图"></p>
+<h4 id="1-2-文件加解密"><a href="#1-2-文件加解密" class="headerlink" title="1.2 文件加解密"></a>1.2 文件加解密</h4><p>Java 代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileUtils</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">FILE_PATH_PREFIX</span> <span class="operator">=</span> Environment.getExternalStorageDirectory() + File.separator;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">FOLDER_NAME</span> <span class="operator">=</span> <span class="string">&quot;NdkSample&quot;</span> + File.separator;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">String</span> <span class="variable">FILE_PATH</span> <span class="operator">=</span> FILE_PATH_PREFIX + FOLDER_NAME;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">fileEncrypt</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">normalFilePath</span> <span class="operator">=</span> FILE_PATH + <span class="string">&quot;cats.jpg&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">encryptFilePath</span> <span class="operator">=</span> FILE_PATH + <span class="string">&quot;cats_encrypt.jpg&quot;</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fileEncrypt(normalFilePath, encryptFilePath);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">fileDecode</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">encryptFilePath</span> <span class="operator">=</span> FILE_PATH + <span class="string">&quot;cats_encrypt.jpg&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">decodeFilePath</span> <span class="operator">=</span> FILE_PATH + <span class="string">&quot;cats_decode.jpg&quot;</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fileDecode(encryptFilePath, decodeFilePath);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">	   <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="type">boolean</span> <span class="title function_">fileEncrypt</span><span class="params">(String normalFilePath, String encryptFilePath)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="type">boolean</span> <span class="title function_">fileDecode</span><span class="params">(String encryptFilePath, String decodeFilePath)</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JNI 加密代码实现，注意加文件读写权限</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">char</span> *PASSWORD = <span class="string">&quot;pw&quot;</span>;</span><br><span class="line"><span class="type">long</span> <span class="title function_">getFileSize</span><span class="params">(<span class="type">char</span>* filePath)</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span></span><br><span class="line">JNIEXPORT jboolean JNICALL</span><br><span class="line"><span class="title function_">Java_cn_cfanr_ndksample_utils_FileUtils_fileEncrypt</span><span class="params">(JNIEnv *env, jclass type, jstring normalFilePath_,</span></span><br><span class="line"><span class="params">                                                    jstring encryptFilePath_)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *normalFilePath = env-&gt;GetStringUTFChars(normalFilePath_, <span class="number">0</span>);</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *encryptFilePath = env-&gt;GetStringUTFChars(encryptFilePath_, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> passwordLen = <span class="built_in">strlen</span>(PASSWORD);</span><br><span class="line"></span><br><span class="line">    LOGE(<span class="string">&quot;要加密的文件的路径 = %s , 加密后的文件的路径 = %s&quot;</span>, normalFilePath, encryptFilePath);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//读文件指针</span></span><br><span class="line">    FILE *frp = fopen(normalFilePath, <span class="string">&quot;rb&quot;</span>);</span><br><span class="line">    <span class="comment">// 写文件指针</span></span><br><span class="line">    FILE *fwp = fopen(encryptFilePath, <span class="string">&quot;wb&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (frp == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        LOGE(<span class="string">&quot;文件不存在&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> JNI_FALSE;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (fwp == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        LOGE(<span class="string">&quot;没有写权限&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> JNI_FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 边读边写边加密</span></span><br><span class="line">    <span class="type">int</span> buffer;</span><br><span class="line">    <span class="type">int</span> index = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> ((buffer = fgetc(frp)) != EOF) &#123;</span><br><span class="line">        <span class="comment">// write</span></span><br><span class="line">        fputc(buffer ^ *(PASSWORD + (index % passwordLen)), fwp);  <span class="comment">//异或的方式加密</span></span><br><span class="line">        index++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 关闭文件流</span></span><br><span class="line">    fclose(fwp);</span><br><span class="line">    fclose(frp);</span><br><span class="line"></span><br><span class="line">    LOGE(<span class="string">&quot;文件加密成功&quot;</span>);</span><br><span class="line"></span><br><span class="line">    env-&gt;ReleaseStringUTFChars(normalFilePath_, normalFilePath);</span><br><span class="line">    env-&gt;ReleaseStringUTFChars(encryptFilePath_, encryptFilePath);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> JNI_TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解密代码类似。</p>
+<h4 id="1-3-文件分割合并"><a href="#1-3-文件分割合并" class="headerlink" title="1.3 文件分割合并"></a>1.3 文件分割合并</h4><p>Java 代码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">fileSplit</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">splitFilePath</span> <span class="operator">=</span> FILE_PATH + <span class="string">&quot;image.jpg&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">suffix</span> <span class="operator">=</span> <span class="string">&quot;.b&quot;</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fileSplit(splitFilePath, suffix, <span class="number">4</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 文件合并</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">fileMerge</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">splitFilePath</span> <span class="operator">=</span> FILE_PATH + <span class="string">&quot;image.jpg&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">splitSuffix</span> <span class="operator">=</span> <span class="string">&quot;.b&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">mergeSuffix</span> <span class="operator">=</span> <span class="string">&quot;.jpeg&quot;</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> fileMerge(splitFilePath, splitSuffix, mergeSuffix, <span class="number">4</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 文件分割</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> splitFilePath 要分割文件的路径</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> suffix        分割文件的扩展名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> fileNum       分割文件的数量</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="type">boolean</span> <span class="title function_">fileSplit</span><span class="params">(String splitFilePath, String suffix, <span class="type">int</span> fileNum)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 文件合并</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> splitFilePath 分割文件的路径</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> splitSuffix   分割文件的扩展名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> mergeSuffix   合并文件的扩展名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> fileNum       分割文件的数量</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="type">boolean</span> <span class="title function_">fileMerge</span><span class="params">(String splitFilePath, String splitSuffix, String mergeSuffix, <span class="type">int</span> fileNum)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>注意，文件的分割合并需要设置文件扩展名后分割文件数量。分割时，分两种情况，<br>1）能整除的，直接平均分；<br>2）不能整除的，fileSize % ( n -1)，前 n -1 个平均分，剩余的留给最后一个；<br><strong>合并时，需要注意的是，必须按照分割的顺序合并</strong></p>
+<p>其余 JNI 实现代码略，可以到 GitHub 查看具体源码：<a class="link"   target="_blank" rel="noopener" href="https://github.com/navyifanr/NdkSample/blob/master/app/src/main/cpp/native_file_handler.cpp" >NdkSample&#x2F;native_file_handler.cpp <i class="fas fa-external-link-alt"></i></a></p>
+<h3 id="2-Android-增量更新"><a href="#2-Android-增量更新" class="headerlink" title="2. Android 增量更新"></a>2. Android 增量更新</h3><h4 id="2-1-简介"><a href="#2-1-简介" class="headerlink" title="2.1 简介"></a>2.1 简介</h4><p>所谓增量更新，是<strong>服务器将新旧版本的 apk 做差分处理，生成一个差分包 patch，下发到客户端；客户端再用 patch 包和本地的 apk 合并成新的 apk，再安装</strong>。很显然，这样在一定程度上可以减少更新 apk 时消耗的流量。目前在很多应用市场也有用到这种技术。<strong>增量更新技术主要解决是安装包文件过大的问题。</strong></p>
+<h4 id="2-2-优缺点"><a href="#2-2-优缺点" class="headerlink" title="2.2 优缺点"></a>2.2 优缺点</h4><p>优点：节省流量，下载 apk 时，只需要下载差分包，不用下载完整包；<br>缺点：</p>
+<ul>
+<li>客户端和服务端都需要加入相关的支持。每次新版本发布，服务器需要根据新版本对以前所有老版本生成对应的差分包，而且还要维护不同渠道的包；另外客户端请求时，上传当前版本号，服务器返回对应的差分包和新版本 apk的 md5 值，作为合并新 apk 后的校验；所以整体流程会有点繁琐；</li>
+<li>合成差分包会有点耗时（最好用单独线程处理）和耗内存的，内存不足的手机或本地 apk 损坏的 apk 无法进行增量更新；另外 apk 包之间差异比较小（2m 以下）时，生成的差分包仍然有几百 k；</li>
+</ul>
+<h4 id="2-3-差分包的生成与合并"><a href="#2-3-差分包的生成与合并" class="headerlink" title="2.3 差分包的生成与合并"></a>2.3 差分包的生成与合并</h4><p>需要用工具对文件进行 diff 和 patch 处理，一般可以通过 <a class="link"   target="_blank" rel="noopener" href="http://www.daemonology.net/bsdiff/" >bsdiff<i class="fas fa-external-link-alt"></i></a>实现</p>
+<p>具体使用可以参考 Hongyang 的文章 <a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/52761658#t1" >Android 增量更新完全解析  是增量不是热修复 - Hongyang<i class="fas fa-external-link-alt"></i></a>，在这里就不啰嗦了</p>
+<p>注意，在执行 make 命令，可能报以下错误，（以下环境都是在 Mac 上）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">bspatch.c:39:21: error: unknown type name &#x27;u_char&#x27;; did you mean &#x27;char&#x27;?</span><br><span class="line">static off_t offtin(u_char *buf)</span><br><span class="line">                    ^~~~~~</span><br><span class="line">                    char</span><br></pre></td></tr></table></figure>
+
+<p>可以通过在<code>bspatch.c</code> 文件加上<code>#include &lt;sys/types.h&gt;</code>头文件（Hongyang 没说明清楚），参考：<a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/lping/p/5833090.html" >编译和使用bsdiff - 木头平 - 博客园<i class="fas fa-external-link-alt"></i></a></p>
+<p>主要掌握几个命令：</p>
+<ul>
+<li>执行 <code>make</code> 命令，使 makefile  生成 bsdiff 和 bspatch 可执行文件；</li>
+<li>执行 <code>./bsdiff old.apk new.apk update.patch</code>，生成差分包；</li>
+<li>执行 <code>./bspatch old.apk new2.apk update.patch</code>，合成新 apk；</li>
+<li>执行 <code>md5 xxx.apk</code> 查看 apk 的 md5 值；</li>
+</ul>
+<h4 id="2-4-服务端操作"><a href="#2-4-服务端操作" class="headerlink" title="2.4 服务端操作"></a>2.4 服务端操作</h4><p>服务端需要返回一个文件和新版本 apk md5值给客户端。</p>
+<ul>
+<li>用 2.3 生成的 bsdiff 可执行文件生成新版本 apk 和老版本的 apk 的差分包 update.patch；（可以编写个脚本处理）</li>
+<li>使用 md5 命令查看新 apk 的 md5，并保存，之后需要返回给客户端；</li>
+</ul>
+<h4 id="2-5-客户端操作"><a href="#2-5-客户端操作" class="headerlink" title="2.5 客户端操作"></a>2.5 客户端操作</h4><p>主要实现是如何制造 bspatch 的 so 文件，由于网上详细的步骤都比较完善了，这里也不啰嗦了，只简单说下需要注意的问题。</p>
+<p>由于按照 AS 的默认的 CMake 建 NDK 的方式，C&#x2F;C++ 的文件是在 cpp 目录的，Hongyang 的是在 jni 目录，两者配置方式不太一样，如果同时使用，只会编译 CMake 的配置，所以需要将 <code>bspatch.c</code>放到 cpp 目录，同时还需要下载 <a class="link"   target="_blank" rel="noopener" href="http://www.bzip.org/downloads.html" >bzip<i class="fas fa-external-link-alt"></i></a> 源码</p>
+<p>详细步骤可以参考，<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/myatlantis/article/details/52874227#t1" >Android增量更新与CMake构建工具 - 亚特兰蒂斯 - CSDN博客<i class="fas fa-external-link-alt"></i></a></p>
+<p>PS：这里的 CMakeLists.txt 是放在 cpp 目录下，特别需要注意的是，<strong>由于 CMakeLists.txt 目录改变了，必须修改 C&#x2F;C++ 源文件的路径，去掉</strong> <code>src/main/cpp</code>，同时也要修改<code>build.gradle</code>的 cmake 文件的路径，不然会编译失败</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># Sets the minimum version of CMake required to build the native library.</span><br><span class="line">cmake_minimum_required(VERSION 3.4.1)</span><br><span class="line"></span><br><span class="line">#支持-std=gnu++11</span><br><span class="line">set(CMAKE_VERBOSE_MAKEFILE on)</span><br><span class="line">set(CMAKE_CXX_FLAGS &quot;$&#123;CMAKE_CXX_FLAGS&#125; -std=gnu++11 -Wall -DGLM_FORCE_SIZE_T_LENGTH&quot;)</span><br><span class="line">set(CMAKE_CXX_FLAGS &quot;$&#123;CMAKE_CXX_FLAGS&#125; -DGLM_FORCE_RADIANS&quot;)</span><br><span class="line"></span><br><span class="line">#设置生成的so动态库最后输出的路径</span><br><span class="line">set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $&#123;PROJECT_SOURCE_DIR&#125;/../jniLibs/$&#123;ANDROID_ABI&#125;)</span><br><span class="line"></span><br><span class="line">#添加bzip2目录，为构建添加一个子路径</span><br><span class="line">set(bzip2_src_DIR $&#123;CMAKE_SOURCE_DIR&#125;)</span><br><span class="line">add_subdirectory($&#123;bzip2_src_DIR&#125;/bzip2)</span><br><span class="line"></span><br><span class="line">add_library( native-lib</span><br><span class="line">             SHARED</span><br><span class="line">             # Provides a relative path to your source file(s). 注意，CMakeLists.txt 在 cpp 目录下，此处不需要加路径前缀 src/main/cpp</span><br><span class="line">             native_file_handler.cpp</span><br><span class="line">             bspatch.c</span><br><span class="line">             )</span><br><span class="line"></span><br><span class="line">find_library(log-lib log )</span><br><span class="line"></span><br><span class="line">target_link_libraries(native-lib $&#123;log-lib&#125; )</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>build.gradle 文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">externalNativeBuild &#123;</span><br><span class="line">     cmake &#123;</span><br><span class="line">         path <span class="string">&quot;src/main/cpp/CMakeLists.txt&quot;</span></span><br><span class="line">     &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>另外，修改的 <code>bspatch.c</code> 文件增加的 JNI 代码中，<strong>第一个参数是 so 库的名字，注意一定要保持一致</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//……</span></span><br><span class="line">JNIEXPORT jint JNICALL <span class="title function_">Java_cn_cfanr_ndksample_utils_BsPatch_bspatch</span><span class="params">(JNIEnv *env, jclass jcls, jstring oldApk_,jstring newApk_, jstring patch_)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *oldApkPath = (*env)-&gt;GetStringUTFChars(env, oldApk_, <span class="number">0</span>);</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *newApkPath = (*env)-&gt;GetStringUTFChars(env, newApk_, <span class="number">0</span>);</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *patchPath = (*env)-&gt;GetStringUTFChars(env, patch_, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> argc = <span class="number">4</span>;</span><br><span class="line">    <span class="type">char</span>* argv[argc];</span><br><span class="line">    argv[<span class="number">0</span>] = <span class="string">&quot;native-lib&quot;</span>;  <span class="comment">//注意此处是 so 库名字</span></span><br><span class="line">    argv[<span class="number">1</span>] = oldApkPath;</span><br><span class="line">    argv[<span class="number">2</span>] = newApkPath;</span><br><span class="line">    argv[<span class="number">3</span>] = patchPath;</span><br><span class="line"></span><br><span class="line">    jint ret = patchMethod(argc, argv);</span><br><span class="line"></span><br><span class="line">    (*env)-&gt;ReleaseStringUTFChars(env, oldApk_, oldApkPath);</span><br><span class="line">    (*env)-&gt;ReleaseStringUTFChars(env, newApk_, newApkPath);</span><br><span class="line">    (*env)-&gt;ReleaseStringUTFChars(env, patch_, patchPath);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//……</span></span><br></pre></td></tr></table></figure>
+
+<p>其他代码逻辑：</p>
+<ul>
+<li>1）从服务器下载差分包 update.patch 保存到本地，并请求获取新版 apk 的 md5值；</li>
+<li>2）提取本地的 apk 文件；</li>
+<li>3）使用 JNI 方法<code>public static native int bspatch(String oldApk, String newApk, String patch)</code>将 update.patch 和本地旧的 apk 合并成新的 apk；</li>
+<li>4）校验生成的新 apk 的 md 值是否和服务器返回的一样；</li>
+<li>5）检测新 apk 和服务器提供的一致后，安装新的 apk 文件</li>
+</ul>
+<p>不过 demo 是没有写从服务器下载差分包的逻辑的，这里是将差分包通过 <code>adb push patch路径 /sdcard/NdkSample</code> 命令放到手机来测试的</p>
+<p>具体代码可以查看 Github：<a class="link"   target="_blank" rel="noopener" href="https://github.com/navyifanr/NdkSample/blob/master/app/src/main/java/cn/cfanr/ndksample/PatchUpdateActivity.java" >NdkSample&#x2F;PatchUpdateActivity.java <i class="fas fa-external-link-alt"></i></a></p>
+<h3 id="3-Android-封装-libjpeg-库"><a href="#3-Android-封装-libjpeg-库" class="headerlink" title="3.  Android 封装 libjpeg 库"></a>3.  Android 封装 libjpeg 库</h3><h4 id="3-1-编译-libjpeg-so-库"><a href="#3-1-编译-libjpeg-so-库" class="headerlink" title="3.1  编译 libjpeg.so 库"></a>3.1  编译 libjpeg.so 库</h4><ul>
+<li><p>1.克隆 libjpeg-trubo Android 版到本地，并解压</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone git://git.linaro.org/people/tomgall/libjpeg-turbo/libjpeg-turbo.git -b linaro-android</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2.在配置好 ndk-build 环境后（具体步骤略），开始编译 libjpeg-trubo 库<br>按照网上大多数教程的步骤都是执行以下命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ndk-build APP_ABI=armeabi-v7a,armeabi </span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>但可能由于我本地配置的版本是 ndk-14的，直接执行这个命令并没有奏效，以下是我遇到的一些错误：</p>
+<ol>
+<li><p>如果你没进入 libjpeg-turbo 目录就执行命令，可能会报以下错误，也就是找不到 Android.mk </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Android NDK: Your APP_BUILD_SCRIPT points to an unknown file: ./Android.mk</span><br><span class="line">/Users/cfanr/Library/Android/sdk/ndk-bundle/build/core/add-application.mk:198: *** Android NDK: Aborting...    .  Stop.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>如果报找不到应用项目的目录，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Android NDK: Could not find application project directory !</span><br><span class="line">Android NDK: Please define the NDK_PROJECT_PATH variable to point to it.</span><br><span class="line">/Users/cfanr/Library/Android/sdk/ndk-bundle/build/core/build-local.mk:151: *** Android NDK: Aborting    .  Stop.</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>就需要设置下 <code>NDK_PROJECT_PATH</code> 指定需要编译的代码的工程目录，这里给出的是当前目录，还有，<code>APP_BUILD_SCRIPT</code>是Android makefile文件的路径，如果你还有 <code>Application.mk</code> 文件的话，则可以添加 <code>NDK_APP_APPLICATION_MK=./Application.mk </code>，参考：<a class="link"   target="_blank" rel="noopener" href="http://ticktick.blog.51cto.com/823160/1428354" >Android开发实践：在任意目录执行NDK编译 - Jhuster的专栏<i class="fas fa-external-link-alt"></i></a></p>
+<ol start="3">
+<li>如果 NDK 版本过高，可能会报以下错误，<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Android.mk:11: Extraneous text after `ifeq&#x27; directive</span><br><span class="line">Android NDK: WARNING: Unsupported source file extensions in Android.mk for module jpeg</span><br><span class="line">Android NDK:   turbojpeg-mapfile</span><br><span class="line">/Users/cfanr/Library/Android/sdk/ndk-bundle/build/core/build-binary.mk:687: Android NDK: Module jpeg depends on undefined modules: cutils</span><br><span class="line">/Users/cfanr/Library/Android/sdk/ndk-bundle/build/core/build-binary.mk:700: *** Android NDK: Aborting (set APP_ALLOW_MISSING_DEPS=true to allow missing dependencies)    .  Stop.</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p>所以，我最终的解决方法是用指定的低版本的 ndk （ndk-r11c）去编译，而不是用我在系统配置 ndk。正确的命令，使用指定NDK版本编译<br><code>~/NDK/android-ndk-r11c/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=./Android.mk APP_ABI=armeabi-v7a,armeabi</code></p>
+<p><strong>检测已编译成功：编译成功后，会在 libjpeg-turbo 生成 libs 和 obj 文件夹，里面分别会有你设置的 ABI 类型的  libjpeg.so 库和其他生成的文件，需要拷贝到项目中的是 libs 文件下的 libjpeg.so 库。</strong></p>
+<h4 id="3-2-使用-libjpeg-so-库编写压缩图片的-native-方法"><a href="#3-2-使用-libjpeg-so-库编写压缩图片的-native-方法" class="headerlink" title="3.2 使用 libjpeg.so 库编写压缩图片的 native 方法"></a>3.2 使用 libjpeg.so 库编写压缩图片的 native 方法</h4><p>参考：<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/a992036795/article/details/53814178" >Android使用libjpeg实现图片压缩 - BlueBerry的专栏 - CSDN博客<i class="fas fa-external-link-alt"></i></a></p>
+<ul>
+<li><p><strong>1.拷贝 libjpeg.so 和头文件到项目中</strong><br>首先将不同 ABI 的 libjpeg.so 拷贝到项目的 libs 目录下，再将上面下载的 libjpeg-turbo 的源码的所有头文件拷贝到 cpp&#x2F;include 目录下</p>
+</li>
+<li><p><strong>2.配置CMakeLists文件</strong><br>练习时，要注意 CMakeLists 的配置，不然可能会发生以下错误（博主就是因为没看清楚文章，没配置好，出错后，一直搜索，浪费不少时间 🤷‍♀️）</p>
+</li>
+</ul>
+<p>1）如果 CMakeLists.txt 文件关联到Android的 Bitmap 相关库<code>jnigraphics</code>，会报以下错误，未定义 Bitmap</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Error:(39) undefined reference to &#x27;AndroidBitmap_getInfo&#x27;</span><br><span class="line">Error:(43) undefined reference to &#x27;AndroidBitmap_lockPixels&#x27;</span><br><span class="line">Error:(85) undefined reference to &#x27;AndroidBitmap_unlockPixels&#x27;</span><br><span class="line">Error:error: linker command failed with exit code 1 (use -v to see invocation)</span><br></pre></td></tr></table></figure>
+
+<p>2）如果只是添加了 libjpeg.so 库<code>add_library(libjpeg SHARED IMPORTED )</code>，未设置关联库<code>target_link_libraries()</code>，会报类似以下未定义某些属性的错误：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Error:(99) undefined reference to &#x27;jpeg_std_error&#x27;</span><br><span class="line">Error:(106) undefined reference to &#x27;jpeg_CreateCompress&#x27;</span><br><span class="line">Error:(114) undefined reference to &#x27;jpeg_stdio_dest&#x27;</span><br><span class="line">Error:(122) undefined reference to &#x27;jpeg_set_defaults&#x27;</span><br><span class="line">Error:(126) undefined reference to &#x27;jpeg_set_quality&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>看来不熟悉理解 CMake 构建脚本还是挺容易踩坑的，下篇会详细介绍 CMake 构建脚本的使用。<br>完整构建脚本如下：（如果 libjpeg.so 或头文件放置的目录和我的不一样，下面就需要修改下）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># Sets the minimum version of CMake required to build the native library.</span><br><span class="line">cmake_minimum_required(VERSION 3.4.1)</span><br><span class="line"></span><br><span class="line">#设置生成的so动态库最后输出的路径</span><br><span class="line">set(CMAKE_LIBRARY_OUTPUT_DIRECTORY $&#123;PROJECT_SOURCE_DIR&#125;/src/main/jniLibs/$&#123;ANDROID_ABI&#125;)</span><br><span class="line"></span><br><span class="line">#指定要引用的libjpeg.so的头文件目录</span><br><span class="line">set(LIBJPEG_INCLUDE_DIR src/main/cpp/include)</span><br><span class="line">include_directories($&#123;LIBJPEG_INCLUDE_DIR&#125;)</span><br><span class="line"></span><br><span class="line">#导入libjpeg动态库 SHARED；静态库为STATIC</span><br><span class="line">add_library(libjpeg SHARED IMPORTED)</span><br><span class="line">#对应so目录，这里为了简单设置的是绝对路径（注意要先 add_library，再 set_target_properties）</span><br><span class="line">set_target_properties(libjpeg PROPERTIES IMPORTED_LOCATION /Users/cfanr/AndroidStudioProjects/DemoProjects/NDKSample/compress/libs/$&#123;ANDROID_ABI&#125;/libjpeg.so)</span><br><span class="line"></span><br><span class="line">add_library(</span><br><span class="line">             compress</span><br><span class="line">             SHARED</span><br><span class="line">             src/main/cpp/compress.c</span><br><span class="line">             )</span><br><span class="line"></span><br><span class="line">find_library(graphics jnigraphics)</span><br><span class="line">find_library(log-lib log)</span><br><span class="line"></span><br><span class="line">target_link_libraries(compress libjpeg $&#123;log-lib&#125; $&#123;graphics&#125;)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>3.编写Java 层 native 方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ImageCompress</span> &#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.loadLibrary(<span class="string">&quot;compress&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="title function_">ImageCompress</span><span class="params">()</span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">native</span> <span class="type">boolean</span> <span class="title function_">compressBitmap</span><span class="params">(Bitmap bitmap, String dstPath, <span class="type">int</span> quality, <span class="type">boolean</span> isOptimize)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>4.实现 JNI 逻辑</p>
+<ul>
+<li>1）将 Android 的 Bitmap 解码转化为 RGB 数据；</li>
+<li>2）为 JPEG 对象分配空间并初始化；</li>
+<li>3）获取文件信息，然后指定压缩数据源；</li>
+<li>4）为压缩设定参数，包括图像大小，颜色空间；</li>
+<li>5）开始压缩；</li>
+<li>6）压缩完毕后，释放资源；</li>
+</ul>
+</li>
+</ul>
+<p>具体代码查看：<a class="link"   target="_blank" rel="noopener" href="https://github.com/navyifanr/NdkSample/blob/master/compress/src/main/cpp/compress.c" > navyifanr&#x2F;NdkSample: compress.c<i class="fas fa-external-link-alt"></i></a></p>
+<p>效果图：<br><img src="https://i.loli.net/2019/06/10/5cfe73467f24a29392.png" alt="效果图"></p>
+<h3 id="4-NDK技术在-Android-的应用场景简述"><a href="#4-NDK技术在-Android-的应用场景简述" class="headerlink" title="4. NDK技术在 Android 的应用场景简述"></a>4. NDK技术在 Android 的应用场景简述</h3><h4 id="4-1-首先需要了解-NDk-有什么作用和特点？"><a href="#4-1-首先需要了解-NDk-有什么作用和特点？" class="headerlink" title="4.1 首先需要了解 NDk 有什么作用和特点？"></a>4.1 首先需要了解 NDk 有什么作用和特点？</h4><p>NDK 作用是 Google 提供了交叉编译工具链，能够在 linux 平台编译出在 arm 平台下执行的二进制库文件；<br>NDK 特点：（来自：<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/carson_ho/article/details/73250163" >Android：JNI 与 NDK到底是什么？- Carson_Ho的博客 - CSDN博客<i class="fas fa-external-link-alt"></i></a>）<br><img src="https://i.loli.net/2019/06/10/5cfe734475cce52169.png" alt="NDK特点"></p>
+<h4 id="4-2-应用场景"><a href="#4-2-应用场景" class="headerlink" title="4.2 应用场景"></a>4.2 应用场景</h4><ul>
+<li>优化密集运算和消耗资源较大模块的性能，如音视频解码，图像操作等</li>
+<li>需要提高安全性的地方，编译成 so  库不容易被反编译；如文件加密、核心算法模块等；</li>
+<li>跨平台应用的需要；</li>
+</ul>
+<p>一些 Android NDK 的具体应用场景：</p>
+<ul>
+<li>跨平台的音视频解码库 FFmpeg；</li>
+<li>Android 增量更新技术；</li>
+<li>Android 加固和防逆向技术；</li>
+<li>一些热修复技术；</li>
+<li>人脸识别，OpenCV 等</li>
+<li>Android 平台的游戏开发等；</li>
+</ul>
+<p>附：<br>C&#x2F;C++代码被编译成库文件之后，才能执行，库文件分为动态库和静态库两种：<br><img src="https://i.loli.net/2019/06/10/5cfe73449feef56205.png" alt="SO 库类型"></p>
+<p>库文件来源：C&#x2F;C++代码进行编译链接操作之后，才会生成库文件，不同类型的CPU 操作系统生成的库文件是不一样；</p>
+<ul>
+<li>CPU分类：arm结构，嵌入式设备处理器； x86结构，pc 服务器处理器； 不同的CPU指令集不同；</li>
+<li>交叉编译：windows x86编译出来的库文件可以在arm平台运行的代码；</li>
+<li>交叉编译工具链：Google提供的 NDK 就是交叉编译工具链，可以在linux环境下编译出在ARM 平台下执行的二进制库文件；</li>
+</ul>
+<p><strong>补充：添加 .so 库链接的方法</strong></p>
+<ol>
+<li>简单粗暴的方法<br>直接在 project 或 module 创建一个 src&#x2F;main&#x2F;jniLibs 文件夹，然后拷贝 .so 文件到该文件夹下(当然 so 库要指定 ABI 类型)，如 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-----src</span><br><span class="line">--------main</span><br><span class="line">------------jniLibs</span><br><span class="line">-----------------armabi</span><br><span class="line">---------------------libcompress.so</span><br></pre></td></tr></table></figure></li>
+<li>添加到 libs 的方法<br>直接拷贝含 abi 类型的 so 库到 project-root&#x2F;libs 或 module-root&#x2F;libs 下，如<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-----app</span><br><span class="line">--------libs</span><br><span class="line">------------armabi</span><br><span class="line">------------------libcompress.so</span><br></pre></td></tr></table></figure>
+然后在该 project 或 module 的 build.gradle 文件下添加 jnilibs 的目录路径：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">	//……</span><br><span class="line">	sourceSets &#123;</span><br><span class="line">		main &#123;</span><br><span class="line">			jniLibs.srcDirs = [&#x27;libs&#x27;]</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+最后 build 以下即可，其实最终还是和第一种方法一致的，切换项目的预览模式为‘android’，可以看到多了一个 jniLibs 的文件夹，里面放的内容和 libs 的一样。</li>
+</ol>
+<p>参考资料：<br><a class="link"   target="_blank" rel="noopener" href="http://www.jianshu.com/p/4333d7ddf615" >NDK开发基础②文件加密解密与分割合并 - 简书<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/lmj623565791/article/details/52761658" >Android 增量更新完全解析  是增量不是热修复 - Hongyang - CSDN博客<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/myatlantis/article/details/52874227#t1" >Android增量更新与CMake构建工具 - 亚特兰蒂斯 - CSDN博客<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/honjane/article/details/60328361" >JNI开发实例-封装libjpeg库 保证图片质量压缩图片 - 猫的阁楼 - CSDN博客<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/a992036795/article/details/53814178" >Android使用libjpeg实现图片压缩 - BlueBerry的专栏 - CSDN博客<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/carson_ho/article/details/73250163" >Android：JNI 与 NDK到底是什么？- Carson_Ho的博客 - CSDN博客<i class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/Android-NDK/">#Android NDK</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2017/08/26/Android-NDK-dev-CMake-s-usage/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android NDK 开发：CMake 使用</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2017/08/05/Android-NDK-dev-JNI-s-practice/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android NDK开发：JNI实战篇</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android 开发艺术探索笔记-4.View的工作原理 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android 开发艺术探索笔记-4.View的工作原理</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-07-15 22:53:16</span>
+        <span class="mobile">2016-07-15 22:53</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="4-1初识ViewRoot和DecorView"><a href="#4-1初识ViewRoot和DecorView" class="headerlink" title="4.1初识ViewRoot和DecorView"></a>4.1初识ViewRoot和DecorView</h3><p><code>ViewRoot</code>对应于<code>ViewRootImpl</code>类，它是连接<code>WindowManager</code>和<code>DecorView</code>的纽带，View的三大流程都是通过<code>ViewRoot</code>来完成的。<br>在ActivityThread中，当Activity对象被创建完毕后，会将DecorView添加到Window中，同时会创建ViewRootImpl对象，并将ViewRootImpl对象和DecorView建立关联，源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root = <span class="keyword">new</span> <span class="title class_">ViewRootImpl</span>(view.getContext(), display);</span><br><span class="line">root.setView(view, wparam, panelParentView);</span><br></pre></td></tr></table></figure>
+<p>View的绘制流程是从ViewRoot的performTraversals方法开始的，它经过measure、layout和draw三个过程才能最终将一个View绘制出来，其中measure用来测量View的宽和高，layout用来确定View在父容器中的放置位置，而draw则负责将View绘制在屏幕上，流程如图：</p>
+<span id="more"></span>
+
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/performTraversals%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B.jpg"></p>
+<p>measure过程决定了view的宽高，通常情况下这个宽高都等同于view最终的宽高。layout过程决定了view的四个顶点的坐标和view实际的宽高，通过getWidth和getHeight方法可以得到最终的宽高。draw过程决定了view的显示。</p>
+<p>DecorView其实是一个FrameLayout，内部包含一个竖直方向的LinearLayout，它里面有上面的标题栏和下面的内容栏（id为android.R.id.content）两部分。</p>
+<h3 id="4-2理解MeasureSpec"><a href="#4-2理解MeasureSpec" class="headerlink" title="4.2理解MeasureSpec"></a>4.2理解MeasureSpec</h3><p>1.MeasureSpec代表一个32位int值，高2位代表SpecMode（测量模式），低30位代表SpecSize（某种测量模式下的规格大小）。SpecMode有三种：</p>
+<ul>
+<li>UNSPECIFIED：父容器不对View有任何限制，要多大给多大；</li>
+<li>EXACTLY：父容器已经检测出View所需要的精确大小，View的最终大小就是SpecSize的指定值。LayoutParams中的match_parent和具体值就是这种模式；</li>
+<li>AT_MOST：父容器指定了一个可用大小即SpecSize，View的大小不能大于这个值，对应于LayoutParams的wrap_content。</li>
+</ul>
+<p>2.MeasureSpec不是唯一由LayoutParams决定的，LayoutParams需要和父容器一起才能决定view的MeasureSpec，从而进一步确定view的宽高。<strong>对于DecorView，它的MeasureSpec由窗口的尺寸和其自身的LayoutParams来决定；对于普通view，它的MeasureSpec由父容器的MeasureSpec和自身的LayoutParams来共同决定。</strong></p>
+<p>3.普通view的MeasureSpec的创建规则<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E6%99%AE%E9%80%9Aview%E7%9A%84MeasureSpec%E7%9A%84%E5%88%9B%E5%BB%BA%E8%A7%84%E5%88%99.jpg"></p>
+<p>当view采用固定宽高时，不管父容器的MeasureSpec是什么，view的MeasureSpec都是精确模式，并且大小是LayoutParams中的大小。<br>当view的宽高是match_parent时，如果父容器的模式是精确模式，那么view也是精确模式，并且大小是父容器的剩余空间；如果父容器是最大模式，那么view也是最大模式，并且大小是不会超过父容器的剩余空间。<br>当view的宽高是wrap_content时，不管父容器的模式是精确模式还是最大模式，view的模式总是最大模式，并且大小不超过父容器的剩余空间。</p>
+<h3 id="4-3View的工作流程"><a href="#4-3View的工作流程" class="headerlink" title="4.3View的工作流程"></a>4.3View的工作流程</h3><p>1.measure过程<br>原始View，直接measure就完成测量过程，而ViewGroup，除了完成自己的测量过程，还需要遍历调用所有子元素的measure方法。具体测量方法代码略。</p>
+<p>view的measure过程和Activity的生命周期方法不是同步执行的，因此无法保证Activity执行了onCreate、onStart、onResume时某个view已经测量完毕了。如果view还没有测量完毕，那么获得的宽高就都是0。下面是四种解决该问题的方法：</p>
+<ul>
+<li>Activity&#x2F;View # onWindowFocusChanged方法<br><code>onWindowFocusChanged</code>方法表示view已经初始化完毕了，宽高已经准备好了，这个时候去获取宽高是没问题的。这个方法会被调用多次，当Activity继续执行或者暂停执行的时候，这个方法都会被调用。</li>
+<li>view.post(runnable)<br>通过post将一个runnable投递到消息队列的尾部，然后等待Looper调用此runnable的时候，view也已经初始化好了。</li>
+<li>ViewTreeObserver<br>使用ViewTreeObserver的众多回调方法可以完成这个功能，比如使用onGlobalLayoutListener接口，当view树的状态发生改变或者view树内部的view的可见性发生改变时，onGlobalLayout方法将被回调。伴随着view树的状态改变，这个方法也会被多次调用。</li>
+<li>view.measure(int widthMeasureSpec, int heightMeasureSpec)<br>通过手动对view进行measure来得到view的宽高，这个要根据view的LayoutParams来处理：<br>match_parent：无法measure出具体的宽高；<br>精确值：例如100px<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">widthMeasureSpec</span> <span class="operator">=</span> MeasureSpec.makeMeasureSpec(<span class="number">100</span>, MeasureSpec.EXACTLY);</span><br><span class="line"><span class="type">int</span> <span class="variable">heightMeasureSpec</span> <span class="operator">=</span> MeasureSpec.makeMeasureSpec(<span class="number">100</span>, MeasureSpec.EXACTLY);</span><br><span class="line">view.measure(widthMeasureSpec, heightMeasureSpec);</span><br></pre></td></tr></table></figure>
+wrap_content：如下measure，设置最大值<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">widthMeasureSpec</span> <span class="operator">=</span> MeasureSpec.makeMeasureSpec((<span class="number">1</span> &lt;&lt; <span class="number">30</span>) - <span class="number">1</span>, MeasureSpec.AT_MOST);</span><br><span class="line"><span class="type">int</span> <span class="variable">heightMeasureSpec</span> <span class="operator">=</span> MeasureSpec.makeMeasureSpec((<span class="number">1</span> &lt;&lt; <span class="number">30</span>) - <span class="number">1</span>, MeasureSpec.AT_MOST);</span><br><span class="line">view.measure(widthMeasureSpec, heightMeasureSpec);</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>2.layout过程<br>layout方法的大致流程：先通过setFrame方法来设定View的四个顶点的位置，即初始化mLeft、mRight、mTop和mBottom这四个值，View的四个顶点一旦确定，View在父容器的位置就确定了；接着调用onLayout方法，用于父容器确定子元素的位置，和onMeasure方法类似，<strong>onLayout的具体实现同样和具体的布局有关，所以View和ViewGroup均没有真正实现onLayout方法。</strong></p>
+<p>3.draw过程<br>View的绘制过程遵循如下几步：</p>
+<ul>
+<li>绘制背景background.draw(canvas)</li>
+<li>绘制自己（onDraw）</li>
+<li>绘制children（dispatchDraw）：dispatchDraw会遍历调用所有子元素的draw方法，使draw事件一层层地传递下去。</li>
+<li>绘制装饰（onDrawScrollBars）</li>
+</ul>
+<p>View有一个特殊的方法setWillNotDraw, 如果一个View不需要绘制任何内容，设置这个标记位为true后，系统会做相应优化。对于自定义控件继承ViewGroup，本身不具备绘制功能，可以开启这个标识。</p>
+<h3 id="4-4自定义View"><a href="#4-4自定义View" class="headerlink" title="4.4自定义View"></a>4.4自定义View</h3><p>1.继承View重写onDraw方法，需要自己支持wrap_content，并且padding也要自己处理。继承特定的View例如TextView不需要考虑。<br>2.继承ViewGroup需要派生特殊的Layout<br>3.尽量不要在View中使用Handler，View内部有提供post系列方法可以替代Handler<br>4.View中如果有线程或者动画，需要在onDetachedFromWindow方法中及时停止。<br>5.带有滑动嵌套时，处理好滑动冲突</p>
+<p><code>The end.</code></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/Android%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF/">#Android开发艺术</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2016/07/20/Android-code-style/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android编程规范</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/07/13/art-of-android-development-chapter-3/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android 开发艺术探索笔记-3.View的事件体系</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

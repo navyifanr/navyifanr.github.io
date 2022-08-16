@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            设计模式思考III |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">设计模式思考III</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2015-04-13 17:08:59</span>
+        <span class="mobile">2015-04-13 17:08</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">设计模式</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p><em>续 <a href="http://navyifanr.github.io/2015/04/11/design-pattern-thinking-II/">设计模式思考 II</a></em></p>
+<p><strong>思考方式：<br>1.这种模式怎么理解？（尽量简单易懂）<br>2.类图怎样画？（代码怎样写）<br>3.举个栗子？（使用场景）<br>4.使用这种模式有什么优缺点？（遵循什么原则）</strong></p>
+<p>##行为型模式<br>###14.观察者模式（Observer）<br>(1)理解<br>对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。</p>
+<p>(2)类图</p>
+<span id="more"></span>
+
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F.png" alt="UML-Observer.png"></p>
+<p>(3)栗子<br>Android的点击事件onClickListener；涉及到数据状态发生变化需要通知的情况下，如邮件订阅和RSS订阅，后续有更新，会及时通知；</p>
+<p>(4)优缺点<br>优：目标和观察者间的抽象耦合；支持广播通信</p>
+<p>###15.模板方法模式（Template Method）<br>(1)理解<br>一个操作中的算法的骨架，而将一些步骤延迟到子类中，模板方法使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。 </p>
+<p>(2)类图<br>制造咖啡和茶的模板方法：</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F.png" alt="UML-TemplateMethod.png"></p>
+<p>(3)栗子<br>Android的View的draw方法</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E6%A8%A1%E6%9D%BF%E6%96%B9%E6%B3%95%E6%A8%A1%E5%BC%8F-View-draw.jpg" alt="Android-View-draw方法.jpg"></p>
+<p>适用场景：<br>a.算法或操作遵循相似的逻辑<br>b.重构时（把相同的代码抽取到父类中）<br>c.重要、复杂的算法，核心算法设计为模板算法</p>
+<p>(4)优缺点<br>优：封装性好、复用性好、屏蔽细节、便于维护<br>缺：单继承</p>
+<p>###16.命令模式（Command）<br>(1)理解<br>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化，对请求排队或记录请求日志，以及支持可撤销的操作。</p>
+<p>(2)类图<br>举个例子，司令员下令让士兵去干件事情，从整个事情的角度来考虑，司令员的作用是，发出口令，口令经过传递，传到了士兵耳朵里，士兵去执行。这个过程好在，三者相互解耦，任何一方都不用去依赖其他人，只需要做好自己的事儿就行，司令员要的是结果，不会去关注到底士兵是怎么实现的。</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E5%91%BD%E4%BB%A4%E6%A8%A1%E5%BC%8F.png" alt="UML-Command.png"></p>
+<p>Invoker是调用者（司令员），Receiver是被调用者（士兵），MyCommand是命令，实现了Command接口，持有接收对象，通过以下代码实现调用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">Receiver</span> <span class="variable">receiver</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Receiver</span>();</span><br><span class="line"><span class="type">Command</span> <span class="variable">cmd</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MyCommand</span>(receiver);</span><br><span class="line"><span class="type">Invoker</span> <span class="variable">invoker</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Invoker</span>(cmd);</span><br><span class="line">invoker.action();</span><br></pre></td></tr></table></figure>
+<p>(3)栗子<br>java平台的事件机制，Java Web的Struts，涉及一种将请求和呈现分离的技术。</p>
+<p>(4)优缺点<br>优: 解耦了命令请求者和接受者之间联系。请求者调用一个命令，接受者接受请求并执行相应的动作，因为使用Command模式解耦，请求者无需知道接受者任何接口。<br>缺: 造成出现过多的具体命令类。</p>
+<p>###17.状态模式（State）<br>(1)理解<br>当对象的状态改变时，同时改变其行为。就QQ来说，有几种状态，在线、隐身、忙碌等，每个状态对应不同的操作，而且你的好友也能看到你的状态，所以，状态模式就两点：a.可以通过改变状态来获得不同的行为。b.你的好友能同时看到你的变化。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E7%8A%B6%E6%80%81%E6%A8%A1%E5%BC%8F.png" alt="UML-State.png"></p>
+<p>(3)栗子<br>适用于有多种状态，每种状态又有不同操作的情况，如权限控制。</p>
+<p>(4)优缺点<br>优：状态自动切换并传播，不需要再改动标识</p>
+<p>注：State状态模式和Proxy代理模式都为客户端程序提供了一个目标程序代理，真正的目标程序被代理所隐藏，当客户端程序调用目标程序时，首先将调用请求发送给代理，代理才真正调用目标程序，但是Proxy代理模式和State状态模式有如下区别：<br>a.Proxy代理模式中被调用的目标程序只有一个，而State状态模式中被调用的目标程序有多个。<br>b.Proxy代理模式的目的是控制客户端对目标程序的访问，而State状态模式是为了根据条件动态改变目标程序。</p>
+<p>###18.职责链模式（Chain of Responsibility）<br>(1)理解<br>有多个对象，每个对象持有对下一个对象的引用，这样就会形成一条链，请求在这条链上传递，直到某一对象决定处理该请求。但是发出者并不清楚到底最终那个对象会处理该请求，所以，责任链模式可以实现，在隐瞒客户端的情况下，对系统进行动态的调整。</p>
+<p>(2)类图<br><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E8%B4%A3%E4%BB%BB%E9%93%BE%E6%A8%A1%E5%BC%8F.png" alt="UML-ResponsibilityChain.png"><br>执行以下代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">MyHandler h1=<span class="keyword">new</span> <span class="title class_">MyHandler</span>(<span class="string">&quot;h1&quot;</span>);</span><br><span class="line">MyHandler h2=<span class="keyword">new</span> <span class="title class_">MyHandler</span>(<span class="string">&quot;h2&quot;</span>);</span><br><span class="line">MyHandler h3=<span class="keyword">new</span> <span class="title class_">MyHandler</span>(<span class="string">&quot;h3&quot;</span>);</span><br><span class="line">		</span><br><span class="line">h1.setHandler(h2);</span><br><span class="line">h2.setHandler(h3);</span><br><span class="line">		</span><br><span class="line">h1.operator();</span><br><span class="line"><span class="comment">/*结果：</span></span><br><span class="line"><span class="comment">h1deal...</span></span><br><span class="line"><span class="comment">h2deal...</span></span><br><span class="line"><span class="comment">h3deal...</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>(3)栗子<br>Java中Chain of Responsibility的两个应用例子：<br>a.Java的异常处理机制，当程序中发生异常时，try-catch会比较所捕捉的异常是否符合异常类型，如果符合就执行所设定的处理，如果都没有比对到适当的异常，就会将异常丢出try-catch区块之外。<br>b.Struts1.x中的filter过滤器链，Struts2.x中拦截器链等等，将HTTP请求处理中的字符编码转换，加密&#x2F;解密等常用功能分别作为一个个的请求处理器，接收到客户端请求时对其进行处理，同时在向客户端返回服务端响应时也使用这些处理器进行处理。</p>
+<p>(4)优缺点<br>优：责任链模式可以实现，在隐瞒客户端的情况下，对系统进行动态的调整。</p>
+<p>###19.解释器模式（Interpreter）<br>(1)理解<br>给定一个语言，定义其文法的一种表示，并定义一个解释器，这个解释器使用该表示来解释语言中的句子。一般主要应用在OOP开发中的编译器的开发中，所以适用面比较窄。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E8%A7%A3%E9%87%8A%E5%99%A8%E6%A8%A1%E5%BC%8F.png" alt="解释器模式.png"></p>
+<p>(3)栗子<br>各种各样的解释器，如正则表达式等的解释器等。</p>
+<p>(4)优缺点<br>优： 可以比较方便的修改和扩展文法规则。<br>缺：针对每一个规则都定义了一个类，所以如果一个文法的规则比较多，那对于文法的维护工作也会变得非常困难。</p>
+<p>###20.中介者模式（Mediator）<br>(1)理解<br>用一个中介对象来封装一系列的对象交互，中介者使各对象不需要显式地相互引用，从而使其耦合松散，而且可以独立地改变它们之间的交互。中介者模式又称为调停者模式。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E4%B8%AD%E4%BB%8B%E8%80%85%E6%A8%A1%E5%BC%8F.png" alt="UML-Mediator.png"></p>
+<p>User类统一接口，User1和User2分别是不同的对象，二者之间有关联，如果不采用中介者模式，则需要二者相互持有引用，这样二者的耦合度很高，为了解耦，引入了Mediator类，提供统一接口，MyMediator为其实现类，里面持有User1和User2的实例，用来实现对User1和User2的控制。这样User1和User2两个对象相互独立，他们只需要保持好和Mediator之间的关系就行，剩下的全由MyMediator类来维护！详细：<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/zhangerqing/article/details/8245537" >22.中介者模式（Mediator）<i class="fas fa-external-link-alt"></i></a></p>
+<p>(3)栗子<br>使用情形：在对象之间的交互操作非常多的情况下;每个对象的行为操作都可能依赖很多其他对象,修改一个对象的行为的同时可能会影响到很多其他对象的行为。</p>
+<p>(4)优缺点<br>优：清除了一系列对象之间复杂的耦合关系，并且中介者可以控制这一系列对象的行为，统一管理<br>缺：由于中介者负责着一系列对象的交互与控制，所以中介者的类会非常复杂，而且一旦中介者类无法正常工作，那么所有将行为委托给中介者的类都将会出现问题，所以在使用的时候还是要特别小心。</p>
+<p>###21.访问者模式（Visitor）<br>(1)理解<br>把数据结构和作用于结构上的操作解耦合（即分离对象数据结构与行为），使得操作集合可相对自由地演化。即在不修改已有程序结构的前提下，通过添加额外的“访问者”来完成对已有代码功能的提升。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E8%AE%BF%E9%97%AE%E8%80%85%E6%A8%A1%E5%BC%8F.png" alt="UML-Visitor.png"></p>
+<p>(3)栗子<br>适用场景：如果我们想为一个现有的类增加新功能，不得不考虑几个事情：新功能会不会与现有功能出现兼容性问题？以后会不会再需要添加？如果类不允许修改代码怎么办？<br>面对这些问题，最好的解决方法就是使用访问者模式，访问者模式适用于数据结构相对稳定的系统，把数据结构和算法解耦。</p>
+<p>(4)优缺点<br>优：增加操作很容易，因为增加操作意味着增加新的访问者。访问者模式将有关行为集中到一个访问者对象中，其改变不影响系统数据结构<br>缺：增加新的数据结构很困难。</p>
+<p>###22.策略模式（strategy）<br>(1)理解<br>定义一系列的算法，把它们一个个封装起来，并且使它们可互相替换。策略模式使得算法可独立于使用它的客户而变化。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E7%AD%96%E7%95%A5%E6%A8%A1%E5%BC%8F.png" alt="UML-Strategy.png"><br>详细见: <a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/zhangerqing/article/details/8243942" >13策略模式（strategy）<i class="fas fa-external-link-alt"></i></a></p>
+<p>(3)栗子<br>Android中的动画；JDK的java.util.Comparator<br>适用场景：<br>a.许多相关的类仅仅是行为差异<br>b.运行时选取不同的算法变体<br>c.通过条件语句在多个分支中选取之一</p>
+<p>(4)优缺点<br>优：<br>a.使用组合，使框架更加灵活<br>b.富有弹性，可以较好的应对变化（开闭原则）<br>c.更好的代码复用性（相对于继承）<br>d.消除大量的条件语句<br>缺：<br>a.客户代码需要了解每个策略实现的细节<br>b.增加了对象的数目</p>
+<p>注：State状态模式和Strategy策略模式非常类似，但是有如下区别：<br>a.State状态模式重点在于设定状态变化，根据状态，返回相应的响应。<br>b.Strategy策略模式重点在于根据需求直接采用设定的策略，即根据场景选择合适的处理算法，而不需要改变状态。</p>
+<p>###23.备忘录模式（Memento）<br>(1)理解<br>在不破坏封装性的前提下，捕获一个对象的内部状态，并在该对象之外保存这个状态，这样以后就可以将该对象恢复到先前保存的状态。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E5%A4%87%E5%BF%98%E5%BD%95%E6%A8%A1%E5%BC%8F.jpg" alt="备忘录模式.jpg"></p>
+<p>组织者，把原发器的状态State（全部或者部分状态，一般是变量的值），通过CreateMemento()方法保存起来，继续运行后，等待合适的时机，在通过SetMemento()方法可以再次恢复到之前的状态。在这个过程中，我们并没有对这些状态做任何的访问和设置，实际上这些状态都是私有的，对外是禁止访问的，我们只是通过Memento对象的两个最简单的方法就达到了这个效果。Memento经常写成Originator的内部类。详细：<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/chjttony/article/details/7505664" >Memento设计模式<i class="fas fa-external-link-alt"></i></a></p>
+<p>(3)栗子<br>Android的Canvas的save(),restore()；<br>适用于文字编辑软件&#x2F;IDE集成开发环境中的撤销和恢复操作。</p>
+<p>(4)优缺点<br>优：<br>a.保持封装边界，把很复杂的原发器的内部信息对外部其他对象隐藏起来。<br>b.简化的原发器，把状态操作无形中转化到客户手里，简化了原发器的某些实现。</p>
+<p>###24.迭代器模式（Iterator）<br>(1)理解<br>提供一种统一的方法访问一个容器（container）对象中各个元素，而又不需暴露该对象的内部细节，迭代器模式是为容器而设计。</p>
+<p>(2)类图</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E8%BF%AD%E4%BB%A3%E5%99%A8%E6%A8%A1%E5%BC%8F.png" alt="UML-Iterator.png"></p>
+<p>详见: <a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/zhangerqing/article/details/8243942" >16迭代子模式（Iterator）<i class="fas fa-external-link-alt"></i></a><br>(3)栗子<br>JDK中设计模式的应用：java.util.Iterator，java.util.Enumeration</p>
+<p>(4)优缺点<br>优：<br>a.实现功能分离，简化容器接口。让容器只实现本身的基本功能，把迭代功能委让给外部类实现，符合类的设计原则。<br>b.隐藏容器的实现细节。<br>c.为容器或其子容器提供了一个统一接口，一方面方便调用；另一方面使得调用者不必关注迭代器的实现细节。<br>d.可以为容器或其子容器实现不同的迭代方法或多个迭代方法。</p>
+<p>参考：<br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/zhangerqing/article/details/8194653" >1.Java之美[从菜鸟到高手演变]之设计模式-终点<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/qianxudetianxia/category/312863.html" >2.Android设计模式系列-谦虚天下<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/chjttony/article/category/1123642/2" >3.设计模式系列-Tony Chen<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/zuoxiaolong/category/509144.html" >4.设计模式详解-左潇龙<i class="fas fa-external-link-alt"></i></a><br><a class="link"   target="_blank" rel="noopener" href="http://www.uml.org.cn/oobject/201404035.asp" >5.设计模式UML类图<i class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">#设计模式</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2015/05/03/a-basic-understanding-of-android-dependency-injection/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">简单了解Android的依赖注入</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2015/04/11/design-pattern-thinking-II/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">设计模式思考II</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

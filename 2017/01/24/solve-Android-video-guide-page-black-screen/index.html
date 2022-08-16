@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            ANDROID视频引导滑动黑屏扫雷以及解决方案 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">ANDROID视频引导滑动黑屏扫雷以及解决方案</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2017-01-24 10:51:29</span>
+        <span class="mobile">2017-01-24 10:51</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/android/">android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>前一段时间，公司项目需要做一个视频引导的功能，刚开始以为用个 ViewPager+Fragment+VideoView 不就实现了吗，很快就弄好了。不过后来测试发现在滑动切换页面时会出现黑屏，比较影响用户体验，然后在网上找了各种“可行”的方案，都未能完全解决，最后尝试了一种巧妙的方法才解决这个问题。</p>
+<p>首先说明下，这里视频引导用到的技术点是 ViewPager+Fragment+VideoView（当然也使用过 SurfaceView 来实现，不过原理基本一致），产品提供四个单独的视频（不是一个视频）+ 引导的圆点和进入主页的按钮（不是直接添加在视频上的）。另外限制条件是，产品未提供每个视频的第一帧的图片。</p>
+<span id="more"></span>
+
+<h2 id="解决滑动切换页面黑屏的问题"><a href="#解决滑动切换页面黑屏的问题" class="headerlink" title="解决滑动切换页面黑屏的问题"></a>解决滑动切换页面黑屏的问题</h2><p>出现黑屏的解释：videoview加载资源需要一定的耗时，无内容时会绘制黑色背景。</p>
+<h3 id="1-用遮罩方式掩盖黑屏"><a href="#1-用遮罩方式掩盖黑屏" class="headerlink" title="1.用遮罩方式掩盖黑屏"></a>1.用遮罩方式掩盖黑屏</h3><p>用第一帧的图片作为 videoview 的遮罩，当视频加载好，再隐藏掉这个遮罩。以下例子并不能完全解决黑屏：</p>
+<ul>
+<li>a.  <a class="link"   target="_blank" rel="noopener" href="http://stackoverflow.com/questions/9765629/Android-videoview-black-screen" >Android VideoView black screen - Stack Overflow<i class="fas fa-external-link-alt"></i></a><br>可以看到评论，滑动还是看会有闪烁，而且视频第一帧不一定会在 onPrepared() 被调用后出现，此方案并不可行，但网上最多的就是这种方案</li>
+<li>b. <a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/u013278099/article/details/50727476" >手把手教你炫酷慕课网视频启动导航的完美实现 - Losileeya- CSDN.NET<i class="fas fa-external-link-alt"></i></a><br>这是一种折中的遮罩方法，就是遮罩的图片是带有文字的透明背景图片，切换效果还是有轻微的黑屏，不过不是特别明显，尚可以接受；但由于视频未能提供这样的素材，无法实现；网上也不少解决方案是采取这种方法。</li>
+</ul>
+<h3 id="2-用PageTransformer设置滑动时切换的动画"><a href="#2-用PageTransformer设置滑动时切换的动画" class="headerlink" title="2.用PageTransformer设置滑动时切换的动画"></a>2.用PageTransformer设置滑动时切换的动画</h3><p>当页面比较多时，快速滑动切换，ViewPager 会闪一下，可以添加切换动画作为缓冲。<br>了解自定义 PageTransformer 动画可以看下这个库： <a class="link"   target="_blank" rel="noopener" href="https://github.com/ToxicBakery/ViewPagerTransforms" >GitHub - ToxicBakery&#x2F;ViewPagerTransforms: Library containing common animations needed for transforming ViewPager scrolling for Android v13+.<i class="fas fa-external-link-alt"></i></a></p>
+<h3 id="3-在每个-page-页增加一个宽高都为0的-SurfaceView"><a href="#3-在每个-page-页增加一个宽高都为0的-SurfaceView" class="headerlink" title="3.在每个 page 页增加一个宽高都为0的 SurfaceView"></a>3.在每个 page 页增加一个宽高都为0的 SurfaceView</h3><p>无效</p>
+<h3 id="4-入坑：使用videoView-setZOrderOnTop-true-避免黑屏"><a href="#4-入坑：使用videoView-setZOrderOnTop-true-避免黑屏" class="headerlink" title="4.入坑：使用videoView.setZOrderOnTop(true)避免黑屏"></a>4.入坑：使用videoView.setZOrderOnTop(true)避免黑屏</h3><p>在视频加载前设置一张图片作为过渡图片，之后调用videoView.setZOrderOnTop(true)，确实可以解决滑动黑屏问题，不过调用了该方法，会使其他控件被 VideoView 覆盖。前面的几种方案由于条件限制效果都不是很好，这种方法基本看不到黑屏，但却出现了另一个问题：如何将圆点和按钮置于 VideoView 上面？</p>
+<h2 id="解决调用videoView-setZOrderOnTop-true-，其他控件被覆盖的问题"><a href="#解决调用videoView-setZOrderOnTop-true-，其他控件被覆盖的问题" class="headerlink" title="解决调用videoView.setZOrderOnTop(true)，其他控件被覆盖的问题"></a>解决调用videoView.setZOrderOnTop(true)，其他控件被覆盖的问题</h2><p>由于 VideoView 是继承 SurfaceView 的，也查了相关解决方案，遇到不少坑</p>
+<h3 id="坑1："><a href="#坑1：" class="headerlink" title="坑1："></a>坑1：</h3><p><a class="link"   target="_blank" rel="noopener" href="http://marller.blog.51cto.com/8699646/1762028" >解决SurfaceView调用setZOrderOnTop(true)遮挡其他控件的问题 <i class="fas fa-external-link-alt"></i></a></p>
+<p>调用setZOrderOnTop(true)之后调用了setZOrderMediaOverlay(true)再设置控件显示，解决遮挡问题，但是又出现了黑屏问题，也就是说调用setZOrderMediaOverlay(true)会使前面设置的setZOrderOnTop(true)失效</p>
+<h3 id="坑2："><a href="#坑2：" class="headerlink" title="坑2："></a>坑2：</h3><p><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/jwzhangjie/article/details/9472803" >解决SurfaceView设置透明造成覆盖其他组件的替代方案 - jwzhangjie的专栏CSDN.NET<i class="fas fa-external-link-alt"></i></a><br>里面提到的两种在 SurfaceView设置了setZOrderOnTop(true)后，添加其他组件的方法：使用 PopupWindow 作为容器承载其他控件，考虑到setZOrderOnTop(true)能覆盖其他控件，所以也尝试了用SurfaceView 绘制圆点和按钮（在 videoview调用setZOrderOnTop(true) 后调用自身的setZOrderOnTop(true)覆盖在上面）。在我的实践中，<br>a.用 PopupWindow 作为容器，大部分手机可以使圆点和按钮置于上面，但小米手机第一屏不行，home 键后圆点也会被覆盖掉;<br>b.用 SurfaceView 作为容器小米手机正常了，其他手机异常，圆点和按钮不能显示在 VideoView 上面。。。</p>
+<p>以上两种方法部分手机异常都找不到具体原因。</p>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p><strong>最终使用了Dialog 作为圆点和按钮的容器才解决控件被覆盖的问题。</strong>不过 Dialog 会使 ViewPager 的滑动失效，需要重写 Dialog 的 onTouch 事件，将 TouchEvent 传递给 ViewPager 处理，同时要设置Dialog.setCancelable(false); 避免按返回键，对话框消失掉。<br>不完整代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ContainerDialog</span> <span class="keyword">extends</span> <span class="title class_">Dialog</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> OnTouchOutsideListener onTouchOutsideListener;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">ContainerDialog</span><span class="params">(Context context, <span class="type">int</span> theme)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>(context, theme);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setOnTouchOutsideListener</span><span class="params">(OnTouchOutsideListener onTouchOutsideListener)</span>&#123;</span><br><span class="line">        <span class="built_in">this</span>.onTouchOutsideListener = onTouchOutsideListener;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onTouchEvent</span><span class="params">(MotionEvent event)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(onTouchOutsideListener!=<span class="literal">null</span>)&#123;</span><br><span class="line">            <span class="keyword">return</span> onTouchOutsideListener.onTouchOutside(event);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.onTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">show</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.show();</span><br><span class="line">        <span class="type">Window</span> <span class="variable">window</span> <span class="operator">=</span> <span class="built_in">this</span>.getWindow();</span><br><span class="line">        WindowManager.<span class="type">LayoutParams</span> <span class="variable">layoutParams</span> <span class="operator">=</span> window.getAttributes();</span><br><span class="line">        window.setGravity(Gravity.BOTTOM);</span><br><span class="line">        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;</span><br><span class="line">        layoutParams.width = WindowManager.LayoutParams.WRAP_CONTENT;</span><br><span class="line">        window.setAttributes(layoutParams);</span><br><span class="line">        window.setBackgroundDrawableResource(android.R.color.transparent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">OnTouchOutsideListener</span>&#123;</span><br><span class="line">        <span class="type">boolean</span> <span class="title function_">onTouchOutside</span><span class="params">(MotionEvent event)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>对话框主题</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span>=<span class="string">&quot;FeatureDialogTheme&quot;</span> <span class="attr">parent</span>=<span class="string">&quot;@android:style/Theme.Dialog&quot;</span>&gt;</span><span class="language-xml"></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">&quot;android:windowFrame&quot;</span>&gt;</span>@null<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">&quot;android:windowIsFloating&quot;</span>&gt;</span>true<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">&quot;android:windowContentOverlay&quot;</span>&gt;</span>@null<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">&quot;android:windowBackground&quot;</span>&gt;</span>@android:color/transparent<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">&quot;android:windowNoTitle&quot;</span>&gt;</span>true<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml">	<span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">&quot;android:backgroundDimEnabled&quot;</span>&gt;</span>false<span class="tag">&lt;/<span class="name">item</span>&gt;</span></span></span><br><span class="line"><span class="language-xml"></span><span class="tag">&lt;/<span class="name">style</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>使用方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//……</span></span><br><span class="line"><span class="type">ContainerDialog</span> <span class="variable">mDialog</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ContainerDialog</span>(<span class="built_in">this</span>, R.style.FeatureDialogTheme);</span><br><span class="line">mDialog.setContentView(dotsAndBtnView);</span><br><span class="line">mDialog.setCancelable(<span class="literal">false</span>);</span><br><span class="line">mDialog.setOnTouchOutsideListener(<span class="keyword">new</span> <span class="title class_">ContainerDialog</span>.OnTouchOutsideListener() &#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onTouchOutside</span><span class="params">(MotionEvent event)</span> &#123;</span><br><span class="line">		mViewPager.onTouchEvent(event);</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;);</span><br><span class="line">mDialog.show();</span><br></pre></td></tr></table></figure>
+
+<p>在调用 VideoView.start()前加以下两行代码避免黑屏</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mVideoView.setZOrderOnTop(<span class="literal">true</span>);   </span><br><span class="line">mVideoView.getHolder().setFormat(PixelFormat.TRANSLUCENT);</span><br></pre></td></tr></table></figure>
+
+<p>其他代码略</p>
+<p>注：以上是针对公司项目有限的条件下的测试结果，并不保证其他项目也一样（代码调用位置和使用方法不同，可能效果不一样），只是提供一些方案和想法。</p>
+<p>另外，未尝试的方法：<br>1.只用一个 VideoView，切换 ViewPager 只是变化圆点和 VideoView 的 url，避免切换 VideoView 的黑屏；参照 <a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/student9128/article/details/53056779" >仿虾米音乐引导页面 - Kevin Blog CSDN.NET<i class="fas fa-external-link-alt"></i></a><br>2.使用视频缩略图解决视频黑屏，参照 <a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/I_do_can/article/details/52817331" >Android之ViewPager+VideoView引导界面 - 博客频道 - CSDN.NET<i class="fas fa-external-link-alt"></i></a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">获取视频缩略图</span><br><span class="line"><span class="type">MediaMetadataRetriever</span> <span class="variable">mmr</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">MediaMetadataRetriever</span>();</span><br><span class="line">mmr.setDataSource(<span class="built_in">this</span>, mUri);</span><br><span class="line">mImageView.setImageBitmap(mmr.getFrameAtTime());</span><br><span class="line">添加ViewPager 滑动监听</span><br><span class="line">ViewPager.addOnPageChangeListener,</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onPageScrolled</span><span class="params">(<span class="type">int</span> position, <span class="type">float</span> positionOffset, <span class="type">int</span> positionOffsetPixels)</span></span><br><span class="line">在这个函数里处理缩略图的显示</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onPageScrollStateChanged</span><span class="params">(<span class="type">int</span> state)</span> state==<span class="number">0</span> 时视图准备好了</span><br><span class="line">在这个函数里处理缩略图的消失</span><br></pre></td></tr></table></figure>
+
+<p>—EOF—</p>
+<hr>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/android/">#android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2017/07/18/wechat-mars-android-sample-source-code-analyze/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">微信 Mars Android Sample 源码分析</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/12/07/use-Builder-pattern-realize-a-new-function-guide-page-manager/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android用建造者模式实现一个新功能引导页</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

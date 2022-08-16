@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            【Effective Java】创建和销毁对象 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">【Effective Java】创建和销毁对象</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2015-02-02 16:08:30</span>
+        <span class="mobile">2015-02-02 16:08</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Java/">Java</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>###一、考虑用静态工厂方法代替构造器</p>
+<p>构造器是创建一个对象实例的最基本最常用的方法。开发者在使用某个类的时候，通常会使用new一个构造器来实现，其实也有其他方式可以实现的，如利用发射机制。这里主要说的是通过静态类工厂的方式来创建class的实例，如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static Boolean valueOf(boolean b) &#123;</span><br><span class="line">    return b ? Boolean.TRUE : Boolean.FALSE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>静态工厂方法和构造器不同有以下主要优势：<br><strong>1.有意义的名称。</strong><br>可能有多个构造器，不同构造器有不同的参数，而参数本身并不能确切地描述被返回的对象，所以显得有点模糊，而具有适当名称的静态工厂可读性更强，表达也更清晰。<br>如，构造器BigInteger(int, int, Random)返回一个BigInteger可能是一个素数，改名为BigInteger.probablePrime的静态工厂方法表示也就更加清晰。</p>
+<span id="more"></span>
+
+<p><strong>2.不必在每次调用的时候创建一个新的对象。</strong><br> 这样可以避免创建不必要的重复对象，提高程序效率。</p>
+<p><strong>3.可以返回原返回类型的任何子类型的对象。</strong><br> Java的很多服务提供者框架（ServiceProvider Framework，三个主要组件：服务接口（Service Interface）这是提供者实现的；提供者注册API（Provider Registration API），这是系统用来注册实现，让客户端访问它的；服务访问API（Service Access API），是客户端用来获取服务实例的。可选组件：服务提供者接口（Service Provider Interface），提供者负责创建其服务实现的实例）都运用到这个特性，如JDBC的API。<br>下面是一个包含一个服务提供者接口和一个默认提供者：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">//Service interface</span><br><span class="line">public interface Service&#123;</span><br><span class="line">    //...service methods</span><br><span class="line">&#125;</span><br><span class="line">//Service provider interface</span><br><span class="line">public interface Provider&#123;</span><br><span class="line">    Service newService();</span><br><span class="line">&#125;</span><br><span class="line">//noninstantiable class for service registration and access</span><br><span class="line">public class Service&#123;</span><br><span class="line">    private Service()&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    //Maps service names to services</span><br><span class="line">    private static final Map&lt;String, Provider&gt; providers=new ConcurrentHashMap&lt;String, Provider&gt;();</span><br><span class="line">    public static final String DEFAULT_PROVIDER_NAME=&quot;&lt;def&gt;&quot;;</span><br><span class="line">    //Provider registration API</span><br><span class="line">    public static void registerDefaultProvider(Provider p)&#123;</span><br><span class="line">        registerProvider(DEFAULT_PROVIDER_NAME);</span><br><span class="line">    &#125;</span><br><span class="line">    public static void registerProvider(String name,Provider p)&#123;</span><br><span class="line">        providers.put(name, p);</span><br><span class="line">    &#125;</span><br><span class="line">    //Service access API</span><br><span class="line">    public static Service newInstance()&#123;</span><br><span class="line">        return newInstace(DEFAULT_PROVIDER_NAME);</span><br><span class="line">    &#125;</span><br><span class="line">    public static Service newInstance(String name)&#123;</span><br><span class="line">        Provider p=providers.get(name);</span><br><span class="line">        if(p==null)</span><br><span class="line">            throw new IllegalArgumentException(&quot;No provider registered with name:&quot;+name);</span><br><span class="line">        return p.newService();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>4.在创建参数化类型实例的时候，它们使代码变得更加简洁。</strong><br>原来：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, List&lt;String&gt;&gt; map=new HashMap&lt;String, List&lt;String&gt;&gt;();</span><br></pre></td></tr></table></figure>
+<p>改为静态工厂方法，可以利用参数类型推演的优势，避免了类型参数在一次声明中被多次重写所带来的烦忧：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static &lt;K,V&gt; HashMap&lt;K,V&gt; newInstance() &#123;</span><br><span class="line">    return new HashMap&lt;K,V&gt;();</span><br><span class="line">&#125;</span><br><span class="line">Map&lt;String,String&gt; m = MyHashMap.newInstance();</span><br></pre></td></tr></table></figure>
+<p>当然，静态方法也存在缺点：<br>a.类如果不含公有的或者受保护的构造器，就不能被子类化；<br>b.与其他的静态方法实际上没有任何区别（API没有像构造器那样标识出来）<br>不过，对于静态工厂方法和构造器，通常优先考虑静态工厂方法。</p>
+<p>###二、遇到多个构造参数时要考虑用构建器(Builder模式)<br>静态工厂和构造器有一个共同的局限性：它们都不能很好地扩展到大量的可选参数。当然可以通过以下方法解决：</p>
+<p>方法一：<strong>利用重叠构造器模式</strong>（就是需要多少个参数就在参数列表添加多少个），但是当有很多个参数时，客户端代码会很难编写，并且难以阅读；</p>
+<p>方法二：<strong>JavaBeans模式</strong>，调用一个无参构造函数，然后调用setter方法来设置每个必要的参数，但调用的过程中可能会出现不一致的状态，调试比较麻烦；</p>
+<p>方法三：<strong>Builder模式</strong>。不直接生成想要的对象，而是让客户端利用所有必要的参数调用构造器（或静态方法），得到一个builder对象，然后再在builder对象对每个参数对应的方法进行调用来设置，如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">class NutritionFacts &#123;</span><br><span class="line">    private final int servingSize;</span><br><span class="line">    private final int servings;</span><br><span class="line">    private final int calories;</span><br><span class="line">    private final int fat;</span><br><span class="line">    private final int sodium;</span><br><span class="line">    private final int carbohydrate;</span><br><span class="line">    public static class Builder &#123;</span><br><span class="line">        //对象的必选参数</span><br><span class="line">        private final int servingSize;</span><br><span class="line">        private final int servings;</span><br><span class="line">        //对象的可选参数的缺省值初始化</span><br><span class="line">        private int calories = 0;</span><br><span class="line">        private int fat = 0;</span><br><span class="line">        private int carbohydrate = 0;</span><br><span class="line">        private int sodium = 0;</span><br><span class="line">        //只用少数的必选参数作为构造器的函数参数</span><br><span class="line">        public Builder(int servingSize,int servings) &#123;</span><br><span class="line">            this.servingSize = servingSize;</span><br><span class="line">            this.servings = servings;</span><br><span class="line">        &#125;</span><br><span class="line">        public Builder calories(int val) &#123;</span><br><span class="line">            calories = val;</span><br><span class="line">            return this;</span><br><span class="line">        &#125;</span><br><span class="line">        public Builder fat(int val) &#123;</span><br><span class="line">            fat = val;</span><br><span class="line">            return this;</span><br><span class="line">        &#125;</span><br><span class="line">        public Builder carbohydrate(int val) &#123;</span><br><span class="line">            carbohydrate = val;</span><br><span class="line">            return this;</span><br><span class="line">        &#125;</span><br><span class="line">        public Builder sodium(int val) &#123;</span><br><span class="line">            sodium = val;</span><br><span class="line">            return this;</span><br><span class="line">        &#125;</span><br><span class="line">        public NutritionFacts build() &#123;</span><br><span class="line">            return new NutritionFacts(this);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    private NutritionFacts(Builder builder) &#123;</span><br><span class="line">        servingSize = builder.servingSize;</span><br><span class="line">        servings = builder.servings;</span><br><span class="line">        calories = builder.calories;</span><br><span class="line">        fat = builder.fat;</span><br><span class="line">        sodium = builder.sodium;</span><br><span class="line">        carbohydrate = builder.carbohydrate;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//使用方式</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    NutritionFacts cocaCola = new NutritionFacts.Builder(240, 8).calories(100)</span><br><span class="line">        .sodium(35).carbohydrate(27).build();</span><br><span class="line">    System.out.println(cocaCola);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，如果类的构造器或者静态工厂中具有多个参数，设计这种类时，Builder模式就是种不错的选择！</p>
+<p>###三、用私有构造器或者枚举类型强化Singleton属性<br>Singleton模式经常会被用到，它被用来代表那些本质上唯一的系统组件，如窗口管理器或者文件系统。在Java中实现单例模式主要有三种：</p>
+<p>1.将构造函数私有化，直接通过静态公有的final域字段获取单实例对象：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public class Elvis &#123;</span><br><span class="line">    public static final Elvis INSTANCE = new Elvis();</span><br><span class="line">    private Elivs() &#123; ... &#125;</span><br><span class="line">    public void leaveTheBuilding() &#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样的方式主要优势在于简洁高效，使用者很快就能判定当前类为单实例类，在调用时直接操作Elivs.INSTANCE即可，由于没有函数的调用，因此效率也非常高效。然而事物是具有一定的双面性的，这种设计方式在一个方向上走的过于极端了，因此他的缺点也会是非常明显的。<strong>如果今后Elvis的使用代码被迁移到多线程的应用环境下了，系统希望能够做到每个线程使用同一个Elvis实例，不同线程之间则使用不同的对象实例。那么这种创建方式将无法实现该需求，因此需要修改接口以及接口的调用者代码，这样就带来了更高的修改成本</strong>。</p>
+<p>2.通过公有域成员的方式返回单实例对象：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class Elvis &#123;</span><br><span class="line">    public static final Elvis INSTANCE = new Elvis();</span><br><span class="line">    private Elivs() &#123; ... &#125;</span><br><span class="line">    public static Elvis getInstance() &#123; return INSTANCE; &#125;</span><br><span class="line">    public void leaveTheBuilding() &#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这种方法很好的弥补了第一种方式的缺陷，<strong>如果今后需要适应多线程环境的对象创建逻辑，仅需要修改Elvis的getInstance()方法内部即可</strong>，对用调用者而言则是不变的，这样便极大的缩小了影响的范围。至于效率问题，现今的JVM针对该种函数都做了很好的内联优化，因此不会产生因函数频繁调用而带来的开销。</p>
+<p>3.使用枚举的方式(Java SE5):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public enum Elvis &#123;</span><br><span class="line">    INSTANCE;</span><br><span class="line">    public void leaveTheBuilding() &#123; ... &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>就目前而言，这种方法在功能上和公有域方式相近，但是他更加简洁更加清晰，扩展性更强也更加安全。虽然这种方法还没被广泛采用，但<strong>单元素的枚举类型已经成为实现Singleton的最佳方法。</strong></p>
+<p>###四、通过私有构造器强化不可实例化的能力<br>对于有些工具类如java.lang.Math、java.util.Arrays等，其中只是包含了静态方法和静态域字段，因此对这样的class实例化就显得没有任何意义了。然而在实际的使用中，如果不加任何特殊的处理，这样的classes是可以像其他classes一样被实例化的。这里介绍了一种方式，既将缺省构造函数设置为private，这样类的外部将无法实例化该类，与此同时，<strong>在这个私有的构造函数的实现中直接抛出异常，从而也避免了类的内部方法调用该构造函数</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class UtilityClass &#123;</span><br><span class="line">    //Suppress default constructor for noninstantiability.</span><br><span class="line">    private UtilityClass() &#123;</span><br><span class="line">        throw new AssertionError();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样定义之后，该类将不会再被外部实例化了，否则会产生编译错误。然而这样的定义带来的最直接的负面影响是该类将不能再被子类化。</p>
+<p>###五、避免创建不必要的对象<br>一般来说，最好能重用对象而不是在每次需要的时候创建一个相同功能的新对象。<br>试比较以下两行代码在被多次反复执行时的效率差异：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String s = new String(&quot;stringette&quot;); //don&#x27;t do this</span><br><span class="line">String s = &quot;stringette&quot;;</span><br></pre></td></tr></table></figure>
+<p>由于String被实现为不可变对象，JVM底层将其实现为常量池，既所有值等于”stringette” 的String对象实例共享同一对象地址，而且还可以保证，对于所有在同一JVM中运行的代码，只要他们包含相同的字符串字面常量，该对象就会被重用。<br>我们继续比较下面的例子，并测试他们在运行时的效率差异：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Boolean b = Boolean.valueOf(&quot;true&quot;);</span><br><span class="line">Boolean b = new Boolean(&quot;true&quot;);</span><br></pre></td></tr></table></figure>
+<p>前者通过静态工厂方法保证了每次返回的对象，如果他们都是true或false，那么他们将返回相同的对象。换句话说，valueOf将只会返回Boolean.TRUE或Boolean.FALSE两个静态域字段之一。而后面的Boolean构造方式，每次都会构造出一个新的Boolean实例对象。这样在多次调用后，第一种静态工厂方法将会避免大量不必要的Boolean对象被创建，从而提高了程序的运行效率，也降低了垃圾回收的负担。<br>继续比较下面的代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class Person &#123;</span><br><span class="line">    private final Date birthDate;</span><br><span class="line">    //判断该婴儿是否是在生育高峰期出生的。</span><br><span class="line">    public boolean isBabyBoomer &#123;</span><br><span class="line">        Calender c = Calendar.getInstance(TimeZone.getTimeZone(&quot;GMT&quot;));</span><br><span class="line">        c.set(1946,Calendar.JANUARY,1,0,0,0);</span><br><span class="line">        Date dstart = c.getTime();</span><br><span class="line">        c.set(1965,Calendar.JANUARY,1,0,0,0);</span><br><span class="line">        Date dend = c.getTime();</span><br><span class="line">        return birthDate.compareTo(dstart) &gt;= 0 &amp;&amp; birthDate.compareTo(dend) &lt; 0;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">//修改后</span><br><span class="line">public class Person &#123;</span><br><span class="line">    private static final Date BOOM_START;</span><br><span class="line">    private static final Date BOOM_END;</span><br><span class="line">    </span><br><span class="line">    static &#123;</span><br><span class="line">        Calender c = Calendar.getInstance(TimeZone.getTimeZone(&quot;GMT&quot;));</span><br><span class="line">        c.set(1946,Calendar.JANUARY,1,0,0,0);</span><br><span class="line">        BOOM_START = c.getTime();</span><br><span class="line">        c.set(1965,Calendar.JANUARY,1,0,0,0);</span><br><span class="line">        BOOM_END = c.getTime();</span><br><span class="line">    &#125;</span><br><span class="line">    public boolean isBabyBoomer() &#123;</span><br><span class="line">        return birthDate.compareTo(BOOM_START) &gt;= 0 &amp;&amp; birthDate.compareTo(BOOM_END) &lt; 0;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>改进后的Person类只是在初始化的时候创建Calender、TimeZone和Date实例一次，而不是在每次调用isBabyBoomer方法时都创建一次他们。如果该方法会被频繁调用，效率的提升将会极为显著。<br>集合框架中的Map接口提供keySet方法，该方法每次都将返回底层原始Map对象键数据的视图，而并不会为该操作创建一个Set对象并填充底层Map所有键的对象拷贝。因此当多次调用该方法并返回不同的Set对象实例时，事实上他们底层指向的将是同一段数据的引用。<br>在该条目中还提到了自动装箱行为给程序运行带来的性能冲击，如果可以通过原始类型完成的操作应该尽量避免使用装箱类型以及他们之间的交互使用。见下例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    Long sum = 0L;  //注意Long与long</span><br><span class="line">    for (long i = 0; i &lt; Integer.MAX_VALUE; ++i) &#123;</span><br><span class="line">        sum += i;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(sum);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本例中由于错把long sum定义成Long sum，其效率降低了近10倍，这其中的主要原因便是该错误导致了2的31次方个临时Long对象被创建了。<strong>要优先使用基本类型而不是装箱基本类型，要当心无意识的自动装箱。</strong></p>
+<p>###六、消除过期的对象引用<br>尽管Java的JVM垃圾回收机制对内存进行智能管理了，不像C++那样需要手动管理，但只是因为如此，Java中内存泄露变得更加隐匿，更加难以发现，见如下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public class Stack &#123;</span><br><span class="line">    private Object[] elements;</span><br><span class="line">    private int size = 0;</span><br><span class="line">    private static final int DEFAULT_INITIAL_CAPACITY = 16;</span><br><span class="line">    public Stack() &#123;</span><br><span class="line">        elements = new Object[DEFAULT_INITIAL_CAPACITY];</span><br><span class="line">    &#125;</span><br><span class="line">    public void push(Object e) &#123;</span><br><span class="line">        ensureCapacity();</span><br><span class="line">        elements[size++] = e;</span><br><span class="line">    &#125;</span><br><span class="line">    public Object pop() &#123;</span><br><span class="line">        if (size == 0) </span><br><span class="line">            throw new EmptyStackException();</span><br><span class="line">        return elements[--size];</span><br><span class="line">    &#125;</span><br><span class="line">    private void ensureCapacity() &#123;</span><br><span class="line">        if (elements.length == size)</span><br><span class="line">            elements = Arrays.copys(elements,2*size+1);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上示例代码，在正常的使用中不会产生任何逻辑问题，然而随着程序运行时间不断加长，内存泄露造成的副作用将会慢慢的显现出来，如磁盘页交换、OutOfMemoryError等。那么内存泄露隐藏在程序中的什么地方呢？当我们调用pop方法是，该方法将返回当前栈顶的elements，同时将该栈的活动区间(size)减一，然而此时被弹出的Object仍然保持至少两处引用，一个是返回的对象，另一个则是该返回对象在elements数组中原有栈顶位置的引用。这样即便外部对象在使用之后不再引用该Object，那么它仍然不会被垃圾收集器释放，久而久之导致了更多类似对象的内存泄露。修改方式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public Object pop() &#123;</span><br><span class="line">    if (size == 0) </span><br><span class="line">        throw new EmptyStackException();</span><br><span class="line">    Object result = elements[--size];</span><br><span class="line">    elements[size] = null; //手工将数组中的该对象置空</span><br><span class="line">    return result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于现有的Java垃圾收集器已经足够只能和强大，因此没有必要对所有不在需要的对象执行obj &#x3D; null的显示置空操作，这样反而会给程序代码的阅读带来不必要的麻烦，该条目只是推荐在以下3中情形下需要考虑资源手工处理问题：<br>1)类是自己管理内存，如例子中的Stack类。<br>2)使用对象缓存机制时，需要考虑被从缓存中换出的对象，或是长期不会被访问到的对象。<br>3)事件监听器和相关回调。用户经常会在需要时显示的注册，然而却经常会忘记在不用的时候注销这些回调接口实现类。</p>
+<p>###七、避免使用终结方法<br>终结方法（finalizer）通常是不可预测的，也是很危险的，一般情况下是不必要的。使用终结方法会导致行为不稳定、降低性能，以及可移植性问题。</p>
+<p>在Java中完成这样的工作主要是依靠try-finally机制来协助完成的。然而Java中还提供了另外一种被称为finalizer的机制，使用者仅仅需要重载Object对象提供的finalize方法，这样当JVM的在进行垃圾回收时，就可以自动调用该方法。但是由于对象何时被垃圾收集的不确定性，以及finalizer给GC带来的性能上的影响，因此并不推荐使用者依靠该方法来达到关键资源释放的目的。比如，有数千个图形句柄都在等待被终结和回收，可惜的是执行终结方法的线程优先级要低于普通的工作者线程，这样就会有大量的图形句柄资源停留在finalizer的队列中而不能被及时的释放，最终导致了系统运行效率的下降，甚至还会引发JVM报出OutOfMemoryError的错误。<br>Java的语言规范中并没有保证该方法会被及时的执行，甚至都没有保证一定会被执行。即便开发者在code中手工调用了System.gc和System.runFinalization这两个方法，这仅仅是提高了finalizer被执行的几率而已。还有一点需要注意的是，被重载的finalize()方法中如果抛出异常，其栈帧轨迹是不会被打印出来的。在Java中被推荐的资源释放方法为，提供显式的具有良好命名的接口方法，如FileInputStream.close()和Graphic2D.dispose()等。然后使用者在finally区块中调用该方法，见如下代码:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public void test() &#123;</span><br><span class="line">    FileInputStream fin = null;</span><br><span class="line">    try &#123;</span><br><span class="line">        fin = new FileInputStream(filename);</span><br><span class="line">        //do something.</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        fin.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在实际的开发中，利用finalizer又能给我们带来什么样的帮助呢？见下例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">public class FinalizeTest &#123;</span><br><span class="line">    //@Override</span><br><span class="line">    protected void finalize() throws Throwable &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">            //在调试过程中通过该方法，打印对象在被收集前的各种状态，</span><br><span class="line">            //如判断是否仍有资源未被释放，或者是否有状态不一致的现象存在。</span><br><span class="line">            //推荐将该finalize方法设计成仅在debug状态下可用，而在release</span><br><span class="line">            //下该方法并不存在，以避免其对运行时效率的影响。</span><br><span class="line">            System.out.println(&quot;The current status: &quot; + _myStatus);</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            //在finally中对超类finalize方法的调用是必须的，这样可以保证整个class继承</span><br><span class="line">            //体系中的finalize链都被执行。</span><br><span class="line">            super.finalize(); </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整理参考自《Effective Java》和<a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/stephen-liu74/archive/2012/01/13/2228354.html" >Effective Java (创建和销毁对象)<i class="fas fa-external-link-alt"></i></a></p>
+<p><em>EOF</em></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/Java/">#Java</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2015/03/29/android-studio-SQLite-database-example/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">android studio SQLite Database小例</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2014/12/30/the-reading-summary-for-2014/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">2014读书总结——kindle是人类进步的电梯</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

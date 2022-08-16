@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android利用ListView实现多种Item的复杂布局 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android利用ListView实现多种Item的复杂布局</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-04-25 11:25:27</span>
+        <span class="mobile">2016-04-25 11:25</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/android/">android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>在Android开发中，可能会遇到一个可滚动且布局比较复杂的界面，但它并不是一个纯粹的List，类似如下图:</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/160425-demo.bmp" alt="demo.png"><br>通常实现方法可以直接用一个ScrollView将所有内容包起来，里面是列表的部分在代码中用动态添加布局的方式实现；或者外层ScrollView，里面列表部分用ListView(或RecyclerView)实现，但这样需要解决滑动冲突问题(有时并不能很好解决)……所以最好不要同时使用ScrollView和ListView(或RecyclerView)，但如果单使用ScrollView，每次滑动返回时都会重新动态加载，如果页面图片比较多，可能会造成卡顿，所以要自己做缓存判断的处理，而ListView自带有缓存机制，处理相对比较方便。</p>
+<span id="more"></span>
+
+<p>那这种不是纯粹List的布局用ListView如何实现？它也并不是只是头尾部分不相同而已（ListView可以addHeader, addFooter）, 所以要将它分成一个个不同类型的item。下面展示一个之前公司项目所实践用到的一个例子，效果demo如图:</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/160425-ComplexListViewDemo.gif" alt="ComplexListViewDemo.gif"></p>
+<p>嗯，其实也没什么难度，也就是如何将整个页面的划分为不同的item，并处理不同的数据模块，使代码更加模块化，直观而且更容易维护。其中<a class="link"   target="_blank" rel="noopener" href="https://github.com/navyifanr/AndroidTrainingDemo/blob/master/ComplexListViewDemo%2Fapp%2Fsrc%2Fmain%2Fjava%2Fcn%2Fcfanr%2Fcomplexlistviewdemo%2Fadapter%2FHomeAdapter.java" >HomeAdapter<i class="fas fa-external-link-alt"></i></a>是处理List不同item的适配器，相对于普通适配器多了一个getItemViewType()方法的处理；<a class="link"   target="_blank" rel="noopener" href="https://github.com/navyifanr/AndroidTrainingDemo/blob/master/ComplexListViewDemo%2Fapp%2Fsrc%2Fmain%2Fjava%2Fcn%2Fcfanr%2Fcomplexlistviewdemo%2Fadapter%2FImageAdapter.java" >ImageAdapter<i class="fas fa-external-link-alt"></i></a>是图片轮播适配器；HomeItem是整个页面的数据模型，包含了所有item的不同数据模型，接收到网络数据时需要对数据加工再设置到HomeItem，然后根据ItemType 作为不同item类型的判断，再根据不同item获取对应的字段；各个item的数据处理是在单独一个ViewHolder上处理……</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">class HomeItem&#123;</span><br><span class="line">  private ItemType itemType; //作为不同item类型的判断</span><br><span class="line">  private String tagName;</span><br><span class="line">  private Special special;</span><br><span class="line">  private Ad ad;</span><br><span class="line">  private MenuPo[] menuPos;</span><br><span class="line">  private List&lt;MealShow&gt; mealShowList;</span><br><span class="line">  private List&lt;TalentShow&gt; talentShowList;</span><br><span class="line">//……</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，可以看到当上滑时，搜索框会悬停在顶部，此处用到一个小技巧，障眼法，单独的搜索框一直在顶部，通过在滑动的过程中控制它的显示和隐藏即可</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">mListView.setOnScrollListener(new AbsListView.OnScrollListener()&#123;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public void onScrollStateChanged(AbsListView absListView, int i)&#123;</span><br><span class="line">  &#125;</span><br><span class="line">  @Override</span><br><span class="line"></span><br><span class="line">  public void onScroll(AbsListView absListView, int firstVisibleItem,int visibleItemCount, int totalItemCount) &#123;</span><br><span class="line">    if (firstVisibleItem &gt;= 1) &#123;</span><br><span class="line">      rlSearchBar.setVisibility(View.VISIBLE);</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">    rlSearchBar.setVisibility(View.GONE);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>Talk is cheap, read the code.</p>
+<p>Github: <a target="_blank" rel="noopener" href="https://github.com/navyifanr/AndroidTrainingDemo/tree/master/ComplexListViewDemo"><strong>ComplexListViewDemo</strong></a></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/android/">#android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2016/06/26/clear-redundancy-Java-code-toolol%E2%80%94Lombok/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android中消除Java冗长代码神器——Lombok</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2015/08/23/the-summary-of-working-one-month/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">工作一个月总结</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

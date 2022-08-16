@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Android中的Handler, AsyncTask, Thread和Service相关 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Android中的Handler, AsyncTask, Thread和Service相关</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2016-08-10 18:03:17</span>
+        <span class="mobile">2016-08-10 18:03</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/android/">android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h3 id="Android中Handler和AsyncTask的区别"><a href="#Android中Handler和AsyncTask的区别" class="headerlink" title="Android中Handler和AsyncTask的区别"></a>Android中Handler和AsyncTask的区别</h3><p><img src="http://7xigjz.com1.z0.glb.clouddn.com/Handler%E5%92%8CAsyncTask%E5%8C%BA%E5%88%AB.png"></p>
+<p>注：AsyncTask在1.6前是串行的，在1.6开始采用并行，不过到3.0又改回串行，避免并行带来的错误(在1.6-3.0以前，系统默认最大并发执行5个线程，缓冲线程队列最大128个，10个任务的等待，超过会出现java.util.concurrent.RejectedExecutionException异常。在3.0以后，无论有多少任务，都会在其内部单线程执行；)<br>3.1系统以上，可以调用new AsyncTask().executeOnExecutor(Executor exec, Params… params)自定义线程池执行</p>
+<p>附：</p>
+<ul>
+<li><a class="link"   target="_blank" rel="noopener" href="http://www.jianshu.com/p/78e125e1e838" >****<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/iispring/article/details/47180325" >深入源码解析Android中的Handler,Message,MessageQueue,Looper<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/u012403246/article/details/45949963" > Android消息处理机制：源码剖析Handler、Looper，并实现图片异步加载<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/whoislcj/p/5610903.html" >Android线程管理相关系列<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+<span id="more"></span>
+
+<h3 id="Android中Service和Thread的区别"><a href="#Android中Service和Thread的区别" class="headerlink" title="Android中Service和Thread的区别?"></a><a class="link"   target="_blank" rel="noopener" href="https://www.zhihu.com/question/30804052" >Android中Service和Thread的区别?<i class="fas fa-external-link-alt"></i></a></h3><p>先看张图，原帖：<a class="link"   target="_blank" rel="noopener" href="http://www.onsandroid.com/2011/12/difference-between-android.html" >Difference between Android Service,Thread,IntentService and AsyncTask<i class="fas fa-external-link-alt"></i></a></p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/Service,Thread,IntentSerivce%E5%92%8CAsyncTask%E5%8C%BA%E5%88%AB.png"></p>
+<p>对于Service，<a class="link"   target="_blank" rel="noopener" href="https://developer.android.com/reference/android/app/Service.html#WhatIsAService" >官方文档<i class="fas fa-external-link-alt"></i></a>是这样说的，</p>
+<blockquote>
+<p>A Service is not a separate process. The Service object itself does not imply it is running in its own process; unless otherwise specified, it runs in the same process as the application it is part of.<br>A Service is not a thread. It is not a means itself to do work off of the main thread (to avoid Application Not Responding errors).</p>
+</blockquote>
+<p>Service不是单独的进程。它并不一定是运行在自己的独立进程中，可能是作为应用进程的一部分。(当它是Local Service时，运行在主进程的main线程中；当它是Remote Service时, 运行在独立进程的main线程中)<br>Service不是线程。它不能离开主线程工作，所以为了避免ANR，在Service中不能做耗时的操作(需要做时，必须新建一个子线程)</p>
+<p>Service是Android的四大组件之一，用于执行长时间运行后台的任务，优先级高于Activity，也高于在Activity创建的Thread，不容易被杀死；而Thread只是程序执行的最小单元，分配CPU的基本单位。<strong>故Thread和Service是没有任何关系的。</strong></p>
+<p>附：</p>
+<ul>
+<li><a class="link"   target="_blank" rel="noopener" href="https://www.zhihu.com/question/30804052" >Android中的Thread与AsyncTask的区别?-知乎<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://ticktick.blog.51cto.com/823160/1547032" >Android开发实践：使用Service还是Thread<i class="fas fa-external-link-alt"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="http://www.cnblogs.com/newcj/archive/2011/05/30/2061370.html" >Android 中的 Service 全面总结<i class="fas fa-external-link-alt"></i></a></li>
+</ul>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/android/">#android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2016/12/07/use-Builder-pattern-realize-a-new-function-guide-page-manager/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android用建造者模式实现一个新功能引导页</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2016/07/20/Android-code-style/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Android编程规范</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

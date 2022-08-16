@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            android studio SQLite Database小例 |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">android studio SQLite Database小例</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2015-03-29 20:44:32</span>
+        <span class="mobile">2015-03-29 20:44</span>
+    </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fas fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/android/">android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>##简述<br><strong>SQLiteDatabase</strong>是一个可以进行增(Create)、查(Retrieve)、改(Update)、删(Delete)数据，即<strong>CRUD</strong>操作的类。<br>下面教程将向你展示如何使用SQLiteDatabase在Android中实现CRUD操作。</p>
+<p><strong>工具使用：</strong><br>Android studio 1.1.0</p>
+<p><strong>TODO</strong><br>在这个教程中，我们将创建一个app，允许对一个student表进行增查改删的数据操作。<br>很容易吗？是的，如果你知道怎样做的话 :)</p>
+<p>##<strong>表结构</strong><br>这个student表将用于存储学生的详细数据，为了简单，只创建3个域，如下图：</p>
+<span id="more"></span>
+
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/student%E8%A1%A8.png" alt="student表.jpg"></p>
+<blockquote>
+<p><em>id是主键，允许自增</em></p>
+</blockquote>
+<p>##<strong>页面布局</strong><br>创建两个页面布局，第一个页面展示所有学生名字，如下图：</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E5%AD%A6%E7%94%9F%E5%88%97%E8%A1%A8.png" alt="学生列表.jpg"></p>
+<p>第二个页面是学生的详细信息的页面，用户点击listview的每个item时，将会进入这个页面，如下图：</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF.png" alt="详细信息或增加数据页面"></p>
+<p>##<strong>布局实现</strong><br>1.新建一个SQLiteDemo的project;<br>2.实现第一个页面布局activity_main.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">RelativeLayout</span> <span class="attr">xmlns:android</span>=<span class="string">&quot;http://schemas.android.com/apk/res/android&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:tools</span>=<span class="string">&quot;http://schemas.android.com/tools&quot;</span> <span class="attr">android:layout_width</span>=<span class="string">&quot;match_parent&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">&quot;match_parent&quot;</span>   <span class="attr">android:paddingLeft</span>=<span class="string">&quot;@dimen/activity_horizontal_margin&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingRight</span>=<span class="string">&quot;@dimen/activity_horizontal_margin&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingTop</span>=<span class="string">&quot;@dimen/activity_vertical_margin&quot;</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingBottom</span>=<span class="string">&quot;@dimen/activity_vertical_margin&quot;</span> <span class="attr">tools:context</span>=<span class="string">&quot;.MainActivity&quot;</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">&quot;Add&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">&quot;@+id/btnAdd&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_alignParentBottom</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_alignParentLeft</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">       /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">ListView</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">&quot;@android:id/list&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_above</span>=<span class="string">&quot;@+id/btnAdd&quot;</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Button</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">&quot;wrap_content&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">&quot;List All&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">&quot;@+id/btnGetAll&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_alignParentBottom</span>=<span class="string">&quot;true&quot;</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout_toRightOf</span>=<span class="string">&quot;@+id/btnAdd&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">RelativeLayout</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><em>你需要修改ListView的id为 android:id&#x3D;”@+id&#x2F;listView”  如果你选择继承ListActivity在你的Activity类，否则将会出错；content必须有一个ListView，它的id的属性是‘android.R.id.list’</em></p>
+</blockquote>
+<p>3.创建另一个activity，StudentDetail.java，其布局为第二个页面activity_student_detail.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line">&lt;RelativeLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    xmlns:tools=&quot;http://schemas.android.com/tools&quot; android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot; android:paddingLeft=&quot;@dimen/activity_horizontal_margin&quot;</span><br><span class="line">    android:paddingRight=&quot;@dimen/activity_horizontal_margin&quot;</span><br><span class="line">    android:paddingTop=&quot;@dimen/activity_vertical_margin&quot;</span><br><span class="line">    android:paddingBottom=&quot;@dimen/activity_vertical_margin&quot;</span><br><span class="line">    tools:context=&quot;cn.cfanr.sqlitedemo.StudentDetail&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:text=&quot;Name&quot;</span><br><span class="line">        android:id=&quot;@+id/tvName&quot;</span><br><span class="line">        android:layout_alignParentTop=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentLeft=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentStart=&quot;true&quot;</span><br><span class="line">        android:layout_marginTop=&quot;30dp&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:text=&quot;Email&quot;</span><br><span class="line">        android:id=&quot;@+id/tvEmail&quot;</span><br><span class="line">        android:layout_below=&quot;@id/tvName&quot;</span><br><span class="line">        android:layout_alignParentLeft=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentStart=&quot;true&quot;</span><br><span class="line">        android:layout_marginTop=&quot;30dp&quot; /&gt;</span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:text=&quot;Age&quot;</span><br><span class="line">        android:id=&quot;@+id/tvAge&quot;</span><br><span class="line">        android:layout_below=&quot;@id/tvEmail&quot;</span><br><span class="line">        android:layout_alignParentLeft=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentStart=&quot;true&quot;</span><br><span class="line">        android:layout_marginTop=&quot;30dp&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;EditText</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/etName&quot;</span><br><span class="line">        android:inputType=&quot;textPersonName&quot;</span><br><span class="line">        android:ems=&quot;10&quot;</span><br><span class="line">        android:layout_above=&quot;@id/tvEmail&quot;</span><br><span class="line">        android:layout_toRightOf=&quot;@id/tvName&quot;</span><br><span class="line">        android:layout_alignParentRight=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentEnd=&quot;true&quot; /&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    &lt;EditText</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/etEmail&quot;</span><br><span class="line">        android:layout_toRightOf=&quot;@id/tvEmail&quot;</span><br><span class="line">        android:inputType=&quot;textEmailAddress&quot;</span><br><span class="line">        android:ems=&quot;10&quot;</span><br><span class="line">        android:layout_above=&quot;@id/tvAge&quot;</span><br><span class="line">        android:layout_alignParentRight=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentEnd=&quot;true&quot; /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;EditText</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/etAge&quot;</span><br><span class="line">        android:inputType=&quot;number&quot;</span><br><span class="line">        android:ems=&quot;10&quot;</span><br><span class="line">        android:layout_alignBottom=&quot;@id/tvAge&quot;</span><br><span class="line">        android:layout_alignLeft=&quot;@id/etEmail&quot;</span><br><span class="line">        android:layout_alignStart=&quot;@id/etEmail&quot;</span><br><span class="line">        android:layout_alignRight=&quot;@id/etEmail&quot;</span><br><span class="line">        android:layout_alignEnd=&quot;@id/etEmail&quot;</span><br><span class="line">        /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/btnClose&quot;</span><br><span class="line">        android:text=&quot;Close&quot;</span><br><span class="line">        android:layout_alignParentBottom=&quot;true&quot;</span><br><span class="line">        android:layout_alignParentRight=&quot;true&quot;</span><br><span class="line">        /&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/btnSave&quot;</span><br><span class="line">        android:text=&quot;Save&quot;</span><br><span class="line">        android:layout_alignParentBottom=&quot;true&quot;</span><br><span class="line">        android:layout_toLeftOf=&quot;@id/btnClose&quot;/&gt;</span><br><span class="line"></span><br><span class="line">    &lt;Button</span><br><span class="line">        android:layout_width=&quot;wrap_content&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/btnDelete&quot;</span><br><span class="line">        android:text=&quot;Delete&quot;</span><br><span class="line">        android:layout_alignParentBottom=&quot;true&quot;</span><br><span class="line">        android:layout_toLeftOf=&quot;@id/btnSave&quot;/&gt;</span><br><span class="line">&lt;/RelativeLayout&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>4.当用户点击ListView的item时展示学生的详细信息的activity，所以我们需要一个特殊的id来检索学生的详细信息，并且这个id必须来自ListView，可以通过两个方法实现：</p>
+<ul>
+<li>最简单的方法，可以放id和name进listview的item中，展示给用户（不好的UI设计），当用户点击选中item时，将检索的记录传递到StudentDetail.java的activity。</li>
+<li>创建一个layout作为listview的item，通过item中包含学生的id（不过设置成隐藏）来检索学生的详细信息；</li>
+</ul>
+<p>采用第二种方法，创建一个新的layout，view_student_entry.xml，代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:orientation=&quot;vertical&quot; android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:id=&quot;@+id/student_Id&quot;</span><br><span class="line">        android:visibility=&quot;gone&quot;/&gt;</span><br><span class="line"></span><br><span class="line">    &lt;TextView</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;wrap_content&quot;</span><br><span class="line">        android:paddingLeft=&quot;6dip&quot;</span><br><span class="line">        android:paddingTop=&quot;6dip&quot;</span><br><span class="line">        android:textSize=&quot;22sp&quot;</span><br><span class="line">        android:textStyle=&quot;bold&quot;/&gt;</span><br><span class="line">&lt;/LinearLayout&gt;</span><br></pre></td></tr></table></figure>
+
+<p>##<strong>编码</strong><br>1.创建Student类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.cfanr.sqlitedemo;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by ifanr on 2015/3/29.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Student</span> &#123;</span><br><span class="line">    <span class="comment">//表名</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String TABLE=<span class="string">&quot;Student&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//表的各域名</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_ID=<span class="string">&quot;id&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_name=<span class="string">&quot;name&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_email=<span class="string">&quot;email&quot;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_age=<span class="string">&quot;age&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//属性</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> student_ID;</span><br><span class="line">    <span class="keyword">public</span> String name;</span><br><span class="line">    <span class="keyword">public</span> String email;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> age;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>2.为了创建表，需要使用到SQLiteDatabase类（实现CRUD操作）和SQLiteOpenHelper（用于数据库的创建和版本管理），下面先创建一个DBHelper类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.cfanr.sqlitedemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.database.sqlite.SQLiteDatabase;</span><br><span class="line"><span class="keyword">import</span> android.database.sqlite.SQLiteOpenHelper;</span><br><span class="line"><span class="keyword">import</span> android.content.Context;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by ifanr on 2015/3/29.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DBHelper</span> <span class="keyword">extends</span> <span class="title class_">SQLiteOpenHelper</span> &#123;</span><br><span class="line">    <span class="comment">//数据库版本号</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> DATABASE_VERSION=<span class="number">4</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//数据库名称</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String DATABASE_NAME=<span class="string">&quot;crud.db&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">DBHelper</span><span class="params">(Context context)</span>&#123;</span><br><span class="line">        <span class="built_in">super</span>(context,DATABASE_NAME,<span class="literal">null</span>,DATABASE_VERSION);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(SQLiteDatabase db)</span> &#123;</span><br><span class="line">        <span class="comment">//创建数据表</span></span><br><span class="line">        String CREATE_TABLE_STUDENT=<span class="string">&quot;CREATE TABLE &quot;</span>+ Student.TABLE+<span class="string">&quot;(&quot;</span></span><br><span class="line">                +Student.KEY_ID+<span class="string">&quot; INTEGER PRIMARY KEY AUTOINCREMENT ,&quot;</span></span><br><span class="line">                +Student.KEY_name+<span class="string">&quot; TEXT, &quot;</span></span><br><span class="line">                +Student.KEY_age+<span class="string">&quot; INTEGER, &quot;</span></span><br><span class="line">                +Student.KEY_email+<span class="string">&quot; TEXT)&quot;</span>;</span><br><span class="line">        db.execSQL(CREATE_TABLE_STUDENT);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onUpgrade</span><span class="params">(SQLiteDatabase db, <span class="type">int</span> oldVersion, <span class="type">int</span> newVersion)</span> &#123;</span><br><span class="line">        <span class="comment">//如果旧表存在，删除，所以数据将会消失</span></span><br><span class="line">        db.execSQL(<span class="string">&quot;DROP TABLE IF EXISTS &quot;</span>+ Student.TABLE);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//再次创建表</span></span><br><span class="line">        onCreate(db);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>3.新建StudentRepo类，编写CRUD函数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.cfanr.sqlitedemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.ContentValues;</span><br><span class="line"><span class="keyword">import</span> android.content.Context;</span><br><span class="line"><span class="keyword">import</span> android.database.Cursor;</span><br><span class="line"><span class="keyword">import</span> android.database.sqlite.SQLiteDatabase;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Created by ifanr on 2015/3/29.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StudentRepo</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> DBHelper dbHelper;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">StudentRepo</span><span class="params">(Context context)</span>&#123;</span><br><span class="line">        dbHelper=<span class="keyword">new</span> <span class="title class_">DBHelper</span>(context);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">insert</span><span class="params">(Student student)</span>&#123;</span><br><span class="line">        <span class="comment">//打开连接，写入数据</span></span><br><span class="line">        SQLiteDatabase db=dbHelper.getWritableDatabase();</span><br><span class="line">        ContentValues values=<span class="keyword">new</span> <span class="title class_">ContentValues</span>();</span><br><span class="line">        values.put(Student.KEY_age,student.age);</span><br><span class="line">        values.put(Student.KEY_email,student.email);</span><br><span class="line">        values.put(Student.KEY_name,student.name);</span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="type">long</span> student_Id=db.insert(Student.TABLE,<span class="literal">null</span>,values);</span><br><span class="line">        db.close();</span><br><span class="line">        <span class="keyword">return</span> (<span class="type">int</span>)student_Id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">delete</span><span class="params">(<span class="type">int</span> student_Id)</span>&#123;</span><br><span class="line">        SQLiteDatabase db=dbHelper.getWritableDatabase();</span><br><span class="line">        db.delete(Student.TABLE,Student.KEY_ID+<span class="string">&quot;=?&quot;</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;String.valueOf(student_Id)&#125;);</span><br><span class="line">        db.close();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">update</span><span class="params">(Student student)</span>&#123;</span><br><span class="line">        SQLiteDatabase db=dbHelper.getWritableDatabase();</span><br><span class="line">        ContentValues values=<span class="keyword">new</span> <span class="title class_">ContentValues</span>();</span><br><span class="line"></span><br><span class="line">        values.put(Student.KEY_age,student.age);</span><br><span class="line">        values.put(Student.KEY_email,student.email);</span><br><span class="line">        values.put(Student.KEY_name,student.name);</span><br><span class="line"></span><br><span class="line">        db.update(Student.TABLE,values,Student.KEY_ID+<span class="string">&quot;=?&quot;</span>,<span class="keyword">new</span> <span class="title class_">String</span>[] &#123; String.valueOf(student.student_ID) &#125;);</span><br><span class="line">        db.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> ArrayList&lt;HashMap&lt;String, String&gt;&gt; <span class="title function_">getStudentList</span><span class="params">()</span>&#123;</span><br><span class="line">        SQLiteDatabase db=dbHelper.getReadableDatabase();</span><br><span class="line">        String selectQuery=<span class="string">&quot;SELECT &quot;</span>+</span><br><span class="line">                Student.KEY_ID+<span class="string">&quot;,&quot;</span>+</span><br><span class="line">                Student.KEY_name+<span class="string">&quot;,&quot;</span>+</span><br><span class="line">                Student.KEY_email+<span class="string">&quot;,&quot;</span>+</span><br><span class="line">                Student.KEY_age+<span class="string">&quot; FROM &quot;</span>+Student.TABLE;</span><br><span class="line">        ArrayList&lt;HashMap&lt;String,String&gt;&gt; studentList=<span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;HashMap&lt;String, String&gt;&gt;();</span><br><span class="line">        Cursor cursor=db.rawQuery(selectQuery,<span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(cursor.moveToFirst())&#123;</span><br><span class="line">            <span class="keyword">do</span>&#123;</span><br><span class="line">                HashMap&lt;String,String&gt; student=<span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;String,String&gt;();</span><br><span class="line">                student.put(<span class="string">&quot;id&quot;</span>,cursor.getString(cursor.getColumnIndex(Student.KEY_ID)));</span><br><span class="line">                student.put(<span class="string">&quot;name&quot;</span>,cursor.getString(cursor.getColumnIndex(Student.KEY_name)));</span><br><span class="line">                studentList.add(student);</span><br><span class="line">            &#125;<span class="keyword">while</span>(cursor.moveToNext());</span><br><span class="line">        &#125;</span><br><span class="line">        cursor.close();</span><br><span class="line">        db.close();</span><br><span class="line">        <span class="keyword">return</span> studentList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Student <span class="title function_">getStudentById</span><span class="params">(<span class="type">int</span> Id)</span>&#123;</span><br><span class="line">        SQLiteDatabase db=dbHelper.getReadableDatabase();</span><br><span class="line">        String selectQuery=<span class="string">&quot;SELECT &quot;</span>+</span><br><span class="line">                Student.KEY_ID + <span class="string">&quot;,&quot;</span> +</span><br><span class="line">                Student.KEY_name + <span class="string">&quot;,&quot;</span> +</span><br><span class="line">                Student.KEY_email + <span class="string">&quot;,&quot;</span> +</span><br><span class="line">                Student.KEY_age +</span><br><span class="line">                <span class="string">&quot; FROM &quot;</span> + Student.TABLE</span><br><span class="line">                + <span class="string">&quot; WHERE &quot;</span> +</span><br><span class="line">                Student.KEY_ID + <span class="string">&quot;=?&quot;</span>;</span><br><span class="line">        <span class="type">int</span> iCount=<span class="number">0</span>;</span><br><span class="line">        Student student=<span class="keyword">new</span> <span class="title class_">Student</span>();</span><br><span class="line">        Cursor cursor=db.rawQuery(selectQuery,<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;String.valueOf(Id)&#125;);</span><br><span class="line">        <span class="keyword">if</span>(cursor.moveToFirst())&#123;</span><br><span class="line">            <span class="keyword">do</span>&#123;</span><br><span class="line">                student.student_ID =cursor.getInt(cursor.getColumnIndex(Student.KEY_ID));</span><br><span class="line">                student.name =cursor.getString(cursor.getColumnIndex(Student.KEY_name));</span><br><span class="line">                student.email  =cursor.getString(cursor.getColumnIndex(Student.KEY_email));</span><br><span class="line">                student.age =cursor.getInt(cursor.getColumnIndex(Student.KEY_age));</span><br><span class="line">            &#125;<span class="keyword">while</span>(cursor.moveToNext());</span><br><span class="line">        &#125;</span><br><span class="line">        cursor.close();</span><br><span class="line">        db.close();</span><br><span class="line">        <span class="keyword">return</span> student;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>4.用户点击item，进入的详细页面StudentDetail</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.cfanr.sqlitedemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.support.v7.app.ActionBarActivity;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.view.Menu;</span><br><span class="line"><span class="keyword">import</span> android.view.MenuItem;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.widget.Button;</span><br><span class="line"><span class="keyword">import</span> android.widget.EditText;</span><br><span class="line"><span class="keyword">import</span> android.widget.Toast;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">StudentDetail</span> <span class="keyword">extends</span> <span class="title class_">ActionBarActivity</span> <span class="keyword">implements</span> <span class="title class_">View</span>.OnClickListener &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Button btnSave,btnDelete;</span><br><span class="line">    <span class="keyword">private</span> Button btnClose;</span><br><span class="line">    <span class="keyword">private</span> EditText etName;</span><br><span class="line">    <span class="keyword">private</span> EditText etEmail;</span><br><span class="line">    <span class="keyword">private</span> EditText etAge;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> _student_id=<span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_student_detail);</span><br><span class="line"></span><br><span class="line">        btnSave = (Button) findViewById(R.id.btnSave);</span><br><span class="line">        btnDelete = (Button) findViewById(R.id.btnDelete);</span><br><span class="line">        btnClose = (Button) findViewById(R.id.btnClose);</span><br><span class="line"></span><br><span class="line">        etName = (EditText) findViewById(R.id.etName);</span><br><span class="line">        etEmail = (EditText) findViewById(R.id.etEmail);</span><br><span class="line">        etAge = (EditText) findViewById(R.id.etAge);</span><br><span class="line"></span><br><span class="line">        btnSave.setOnClickListener(<span class="built_in">this</span>);</span><br><span class="line">        btnDelete.setOnClickListener(<span class="built_in">this</span>);</span><br><span class="line">        btnClose.setOnClickListener(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line">        _student_id =<span class="number">0</span>;</span><br><span class="line">        <span class="type">Intent</span> <span class="variable">intent</span> <span class="operator">=</span> getIntent();</span><br><span class="line">        _student_id =intent.getIntExtra(<span class="string">&quot;student_Id&quot;</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="type">StudentRepo</span> <span class="variable">repo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StudentRepo</span>(<span class="built_in">this</span>);</span><br><span class="line">        <span class="type">Student</span> <span class="variable">student</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Student</span>();</span><br><span class="line">        student = repo.getStudentById(_student_id);</span><br><span class="line"></span><br><span class="line">        etAge.setText(String.valueOf(student.age));</span><br><span class="line">        etName.setText(student.name);</span><br><span class="line">        etEmail.setText(student.email);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onCreateOptionsMenu</span><span class="params">(Menu menu)</span> &#123;</span><br><span class="line">        <span class="comment">// Inflate the menu; this adds items to the action bar if it is present.</span></span><br><span class="line">        getMenuInflater().inflate(R.menu.menu_student_detail, menu);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onOptionsItemSelected</span><span class="params">(MenuItem item)</span> &#123;</span><br><span class="line">        <span class="comment">// Handle action bar item clicks here. The action bar will</span></span><br><span class="line">        <span class="comment">// automatically handle clicks on the Home/Up button, so long</span></span><br><span class="line">        <span class="comment">// as you specify a parent activity in AndroidManifest.xml.</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">id</span> <span class="operator">=</span> item.getItemId();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//noinspection SimplifiableIfStatement</span></span><br><span class="line">        <span class="keyword">if</span> (id == R.id.action_settings) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.onOptionsItemSelected(item);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onClick</span><span class="params">(View v)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span>(v==findViewById(R.id.btnSave))&#123;</span><br><span class="line">            StudentRepo repo=<span class="keyword">new</span> <span class="title class_">StudentRepo</span>(<span class="built_in">this</span>);</span><br><span class="line">            Student student=<span class="keyword">new</span> <span class="title class_">Student</span>();</span><br><span class="line">            student.age=Integer.parseInt(etAge.getText().toString());</span><br><span class="line">            student.email=etEmail.getText().toString();</span><br><span class="line">            student.name=etName.getText().toString();</span><br><span class="line">            student.student_ID=_student_id;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(_student_id==<span class="number">0</span>)&#123;</span><br><span class="line">                _student_id=repo.insert(student);</span><br><span class="line">                Toast.makeText(<span class="built_in">this</span>,<span class="string">&quot;New Student Insert&quot;</span>,Toast.LENGTH_SHORT).show();</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                repo.update(student);</span><br><span class="line">                Toast.makeText(<span class="built_in">this</span>,<span class="string">&quot;Student Record updated&quot;</span>,Toast.LENGTH_SHORT).show();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (v== findViewById(R.id.btnDelete))&#123;</span><br><span class="line">            <span class="type">StudentRepo</span> <span class="variable">repo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StudentRepo</span>(<span class="built_in">this</span>);</span><br><span class="line">            repo.delete(_student_id);</span><br><span class="line">            Toast.makeText(<span class="built_in">this</span>, <span class="string">&quot;Student Record Deleted&quot;</span>, Toast.LENGTH_SHORT);</span><br><span class="line">            finish();</span><br><span class="line">        &#125;<span class="keyword">else</span> <span class="keyword">if</span> (v== findViewById(R.id.btnClose))&#123;</span><br><span class="line">            finish();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>5.在MainActivity实现获取学生列表和跳转到StudentDetail页面</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> cn.cfanr.sqlitedemo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> android.app.ListActivity;</span><br><span class="line"><span class="keyword">import</span> android.content.Intent;</span><br><span class="line"><span class="keyword">import</span> android.support.v7.app.ActionBarActivity;</span><br><span class="line"><span class="keyword">import</span> android.os.Bundle;</span><br><span class="line"><span class="keyword">import</span> android.view.Menu;</span><br><span class="line"><span class="keyword">import</span> android.view.MenuItem;</span><br><span class="line"><span class="keyword">import</span> android.view.View;</span><br><span class="line"><span class="keyword">import</span> android.widget.AdapterView;</span><br><span class="line"><span class="keyword">import</span> android.widget.Button;</span><br><span class="line"><span class="keyword">import</span> android.widget.ListAdapter;</span><br><span class="line"><span class="keyword">import</span> android.widget.ListView;</span><br><span class="line"><span class="keyword">import</span> android.widget.SimpleAdapter;</span><br><span class="line"><span class="keyword">import</span> android.widget.TextView;</span><br><span class="line"><span class="keyword">import</span> android.widget.Toast;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MainActivity</span> <span class="keyword">extends</span> <span class="title class_">ListActivity</span> <span class="keyword">implements</span> <span class="title class_">android</span>.view.View.OnClickListener &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Button btnAdd,btnGetAll;</span><br><span class="line">    <span class="keyword">private</span> TextView student_Id;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">onCreate</span><span class="params">(Bundle savedInstanceState)</span> &#123;</span><br><span class="line">        <span class="built_in">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        btnAdd = (Button) findViewById(R.id.btnAdd);</span><br><span class="line">        btnAdd.setOnClickListener(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line">        btnGetAll = (Button) findViewById(R.id.btnGetAll);</span><br><span class="line">        btnGetAll.setOnClickListener(<span class="built_in">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onClick</span><span class="params">(View v)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (v== findViewById(R.id.btnAdd))&#123;</span><br><span class="line"></span><br><span class="line">            <span class="type">Intent</span> <span class="variable">intent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(<span class="built_in">this</span>,StudentDetail.class);</span><br><span class="line">            intent.putExtra(<span class="string">&quot;student_Id&quot;</span>,<span class="number">0</span>);</span><br><span class="line">            startActivity(intent);</span><br><span class="line"></span><br><span class="line">        &#125;<span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">            <span class="type">StudentRepo</span> <span class="variable">repo</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StudentRepo</span>(<span class="built_in">this</span>);</span><br><span class="line"></span><br><span class="line">            ArrayList&lt;HashMap&lt;String, String&gt;&gt; studentList =  repo.getStudentList();</span><br><span class="line">            <span class="keyword">if</span>(studentList.size()!=<span class="number">0</span>) &#123;</span><br><span class="line">                <span class="type">ListView</span> <span class="variable">lv</span> <span class="operator">=</span> getListView();</span><br><span class="line">                lv.setOnItemClickListener(<span class="keyword">new</span> <span class="title class_">AdapterView</span>.OnItemClickListener() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">onItemClick</span><span class="params">(AdapterView&lt;?&gt; parent, View view,<span class="type">int</span> position, <span class="type">long</span> id)</span> &#123;</span><br><span class="line">                        student_Id = (TextView) view.findViewById(R.id.student_Id);</span><br><span class="line">                        <span class="type">String</span> <span class="variable">studentId</span> <span class="operator">=</span> student_Id.getText().toString();</span><br><span class="line">                        <span class="type">Intent</span> <span class="variable">objIndent</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Intent</span>(getApplicationContext(),StudentDetail.class);</span><br><span class="line">                        objIndent.putExtra(<span class="string">&quot;student_Id&quot;</span>, Integer.parseInt( studentId));</span><br><span class="line">                        startActivity(objIndent);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">                <span class="type">ListAdapter</span> <span class="variable">adapter</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">SimpleAdapter</span>( MainActivity.<span class="built_in">this</span>,studentList, R.layout.view_student_entry, <span class="keyword">new</span> <span class="title class_">String</span>[] &#123; <span class="string">&quot;id&quot;</span>,<span class="string">&quot;name&quot;</span>&#125;, <span class="keyword">new</span> <span class="title class_">int</span>[] &#123;R.id.student_Id, R.id.student_name&#125;);</span><br><span class="line">                setListAdapter(adapter);</span><br><span class="line">            &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                Toast.makeText(<span class="built_in">this</span>, <span class="string">&quot;No student!&quot;</span>, Toast.LENGTH_SHORT).show();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onCreateOptionsMenu</span><span class="params">(Menu menu)</span> &#123;</span><br><span class="line">        <span class="comment">// Inflate the menu; this adds items to the action bar if it is present.</span></span><br><span class="line">        getMenuInflater().inflate(R.menu.menu_main, menu);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">onOptionsItemSelected</span><span class="params">(MenuItem item)</span> &#123;</span><br><span class="line">        <span class="comment">// Handle action bar item clicks here. The action bar will</span></span><br><span class="line">        <span class="comment">// automatically handle clicks on the Home/Up button, so long</span></span><br><span class="line">        <span class="comment">// as you specify a parent activity in AndroidManifest.xml.</span></span><br><span class="line">        <span class="type">int</span> <span class="variable">id</span> <span class="operator">=</span> item.getItemId();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//noinspection SimplifiableIfStatement</span></span><br><span class="line">        <span class="keyword">if</span> (id == R.id.action_settings) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">super</span>.onOptionsItemSelected(item);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>6.运行结果如下：</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E7%BB%93%E6%9E%9C-%E5%AD%A6%E7%94%9F%E5%88%97%E8%A1%A8.png" alt="学生列表(添加数据后，原来为空)"></p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/%E7%BB%93%E6%9E%9C-%E8%AF%A6%E7%BB%86%E9%A1%B5.png" alt="学生详细信息页面.png"></p>
+<p>参考<a class="link"   target="_blank" rel="noopener" href="http://instinctcoder.com/android-studio-sqlite-database-example/" >http://instinctcoder.com/android-studio-sqlite-database-example/<i class="fas fa-external-link-alt"></i></a></p>
+<p>另外，SQLite的详细资料，<a class="link"   target="_blank" rel="noopener" href="http://blog.csdn.net/liuhe688/article/details/6715983" >Android中SQLite应用详解<i class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+
+        
+
+        
+            <ul class="post-tags-box">
+                
+                    <li class="tag-item">
+                        <a href="/tags/android/">#android</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2015/04/04/how-to-use-apktool/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">android apktool使用</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2015/02/02/Effective-Java-create-and-destroy-object/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">【Effective Java】创建和销毁对象</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>
