@@ -119,89 +119,90 @@
         <div class="tag-name"><i class="fas fa-tag"></i>&nbsp;android
         </div>
         <div class="tag-post-list">
-            
-<div class="archive-list-container">
-    
-        <section class="archive-item">
-            <div class="archive-item-header">
-                <span class="archive-year">2017</span>
-                <span class="archive-year-post-count">[1]</span>
-            </div>
-            <ul class="article-list">
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2017/01/24/solve-Android-video-guide-page-black-screen/"
-                        >ANDROID视频引导滑动黑屏扫雷以及解决方案</a>
-                        <span class="article-date">01-24</span>
-                    </li>
-                
-            </ul>
-        </section>
-    
-        <section class="archive-item">
-            <div class="archive-item-header">
-                <span class="archive-year">2016</span>
-                <span class="archive-year-post-count">[4]</span>
-            </div>
-            <ul class="article-list">
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2016/12/07/use-Builder-pattern-realize-a-new-function-guide-page-manager/"
-                        >Android用建造者模式实现一个新功能引导页</a>
-                        <span class="article-date">12-07</span>
-                    </li>
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2016/08/10/Android-Handler-AsyncTask-Thread-and-Service/"
-                        >Android中的Handler, AsyncTask, Thread和Service相关</a>
-                        <span class="article-date">08-10</span>
-                    </li>
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2016/07/20/Android-code-style/"
-                        >Android编程规范</a>
-                        <span class="article-date">07-20</span>
-                    </li>
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2016/04/25/Android-realize-multi-type-item-s-layout-by-ListView/"
-                        >Android利用ListView实现多种Item的复杂布局</a>
-                        <span class="article-date">04-25</span>
-                    </li>
-                
-            </ul>
-        </section>
-    
-        <section class="archive-item">
-            <div class="archive-item-header">
-                <span class="archive-year">2015</span>
-                <span class="archive-year-post-count">[2]</span>
-            </div>
-            <ul class="article-list">
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2015/04/04/how-to-use-apktool/"
-                        >android apktool使用</a>
-                        <span class="article-date">04-04</span>
-                    </li>
-                
-                    <li class="article-item">
-                        <a class="article-title"
-                           href="/2015/03/29/android-studio-SQLite-database-example/"
-                        >android studio SQLite Database小例</a>
-                        <span class="article-date">03-29</span>
-                    </li>
-                
-            </ul>
-        </section>
-    
-</div>
+            $archive-year-font-size = 1.8rem;
+$archive-year-count-font-size = 1.2rem;
+$article-title-font-size = 1.2rem;
+$article-date-font-size = 1rem;
+
+.archive-list-container {
+
+  .archive-item {
+    margin-bottom: $component-spacing-value;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .archive-item-header {
+      margin-bottom: 10px;
+
+      .archive-year {
+        font-size: $archive-year-font-size;
+
+        +keep-tablet() {
+          font-size: $archive-year-font-size - 0.2rem;
+        }
+
+        color: var(--second-text-color);
+        font-weight: 600;
+        margin-right: 6px;
+      }
+
+
+      .archive-year-post-count {
+        font-size: $archive-year-count-font-size;
+        font-weight: 500;
+        color: var(--second-text-color);
+
+        +keep-tablet() {
+          font-size: $archive-year-count-font-size * 0.9;
+        }
+      }
+
+    }
+
+
+    .article-list {
+
+      padding-left: 10px;
+
+      +keep-tablet() {
+        padding-left: 0;
+      }
+
+      .article-item {
+        font-size: 1rem;
+        margin-top: 18px;
+
+        +keep-tablet() {
+          margin-top: 16px;
+        }
+
+        +keep-mobile() {
+          margin-top: 14px;
+        }
+
+        &:hover {
+          a.article-title, .article-date {
+            color: var(--primary-color);
+          }
+        }
+
+
+        a.article-title {
+          color: var(--default-text-color);
+        }
+
+        .article-date {
+          font-size: $article-date-font-size;
+          float: right;
+        }
+      }
+    }
+  }
+}
+
+
 
         </div>
     </div>

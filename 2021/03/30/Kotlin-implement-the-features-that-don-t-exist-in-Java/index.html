@@ -200,7 +200,7 @@
 <ul>
 <li>从性能上讲，<strong>高阶函数要创建实例，所以开销会增大。</strong></li>
 <li>Kotlin的匿名内部类，在和外部类有互动的时候，也会持有外部类的引用，<strong>存在一定的、潜在的内存泄漏的风险。</strong></li>
-<li><strong><del>高阶函数是通过中间代码添加生成的</del></strong></li>
+<li><strong>高阶函数是通过中间代码添加生成的</strong></li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class类名$方法名$1 : FunctionReference(receiver:方法所在类)，Funtion1 &#123;</span><br><span class="line">  override fun invoke(p1: Int) &#123;</span><br><span class="line">    receiver.showFailedState(p1)</span><br><span class="line">  &#125;</span><br><span class="line">  override fun getOwner() : KDeclarationContainer &#123;</span><br><span class="line">    return Reflection. getOrCreateKotlinClass(方法所在类.class);</span><br><span class="line">  &#125;</span><br><span class="line">  override fun getName() : String &#123;</span><br><span class="line">    return &quot;showFailedState&quot;</span><br><span class="line">  &#125;</span><br><span class="line">  override fun getSignature() : String &#123; </span><br><span class="line">    return &quot;showFailedState(I)V&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
