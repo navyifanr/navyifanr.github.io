@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="探究Android开发技术">
+    <meta name="author" content="cfanr">
+    
+    <title>
+        
+            Kotlin 是如何实现 Java 不存在的特性的？ |
+        
+        cfanr&#39;s Blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/logo.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"navyifanr.github.io","root":"/","language":"en"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/logo.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.5"};
+    KEEP.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+  </script>
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                cfanr&#39;s Blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                HOME
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                ARCHIVES
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Kotlin 是如何实现 Java 不存在的特性的？</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.png">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">cfanr</span>
+                        
+                            <span class="author-label">Lv4</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;
+        <span class="pc">2021-03-30 13:08:47</span>
+        <span class="mobile">2021-03-30 13:08</span>
+    </span>
+    
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>之前初次接触 Kotlin 时，总有个疑问，同样是运行在 JVM 内，而且 Kotlin 和 Java 可以无缝混合开发，那究竟 <strong>Kotlin 是如何实现 Java 不存在的特性的呢？</strong> 今天就来粗略了解这些语法糖的奥妙。</p>
+<blockquote>
+<p>Kotlin 支持的 Java 中没有的特性：类型推断、可变性、可空性、自动拆装箱、泛型数组、高阶函数、DSL、顶层函数、扩展函数、内联函数、伴生对象、数据类、密封类、单例类、类代理、internal、泛型具体化……  </p>
+</blockquote>
+<p>先说结论，Kotlin 编译器通过以下几种方式支持 Java 没有的特性：<br><strong>编译器推断、中间代码添加、元注解、Metadata</strong></p>
+<span id="more"></span>
+
+</br>
+
+<h3 id="kt-是如何编译成-class-的？"><a href="#kt-是如何编译成-class-的？" class="headerlink" title=".kt 是如何编译成 .class 的？"></a>.kt 是如何编译成 .class 的？</h3><p>对语言编译过程有基本认识的话，就知道大概分为以下几步：</p>
+<ul>
+<li>词法分析：把源码的字符流，转化成标记(Token)序列，标记是语言的最小语义单位，包括关键字、标识符、运算符、常数等;</li>
+<li>语法分析：把标记序列，组合成各类语法短句，判断标记序列在语法结构上，是否正确，输出树形结构的抽象语法树；</li>
+<li>语义分析：结合上下文，检查每一个语法短句，语义是否正确，是否符合语言规范。<br><img src="https://s2.loli.net/2023/07/31/m1rzovjfIyAY3K4.png"><br><img src="https://s2.loli.net/2023/07/31/XSyML8EeaQq3goJ.webp"></li>
+</ul>
+<p>所以 kotlin 支持 Java 不存在的特性，主要还是通过 Kotlin 编译器做了加工处理。</p>
+</br>
+
+<h3 id="编译器幕后干的好事"><a href="#编译器幕后干的好事" class="headerlink" title="编译器幕后干的好事"></a>编译器幕后干的好事</h3><p>以下直接说结论，懒得贴反编译的代码了，可以自己写 kotlin 代码，然后通过 AS 的 Tools&#x2F;Kotlin&#x2F;Show kotlin Bytecode，再点击 decompile 查看 Kotlin 转成 Java 的代码</p>
+<p>1）类型推断</p>
+<ul>
+<li>类型推断并不是不确定数据类型，相反是从上下文推断出一个明确的数据类型；</li>
+<li>类型推断的意义在于，<strong>去掉代码中的冗余信息，提升研发效率；</strong></li>
+<li>类型推断主要发生在<strong>语法分析和语义分析阶段</strong>；</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">val name = “Vincent” //String</span><br><span class="line">val x = 1  //int</span><br><span class="line">val y = 1.0f //float</span><br><span class="line">val z = x + y //float</span><br><span class="line">//泛型类型推断</span><br><span class="line">fun &lt;T&gt; create(): T &#123;&#125;</span><br><span class="line">val fruit = create&lt;Apple&gt;()  </span><br><span class="line">val apple: Apple = create() </span><br></pre></td></tr></table></figure>
+<p>2）Kotlin 的自动拆装箱</p>
+<ul>
+<li>自动拆装箱是有性能损耗的</li>
+<li>支持泛型类型，所以默认不具备协变性，字节码实现对应anewarray，相当于Java的Integer[]。</li>
+<li>字节码实现对应newarray，相当于Java的int[]，性能较好。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">//Java 1.5 后支持自动拆装箱</span><br><span class="line">Integer x = 1;  //自动装箱</span><br><span class="line">int y = x;      //自动拆箱</span><br><span class="line"></span><br><span class="line">var i: Int = 0      //int</span><br><span class="line">var i: Int? = null  //java.lang.Integer</span><br><span class="line">i = 0               //Integer.valueOf</span><br><span class="line"></span><br><span class="line">val list = mutableListOf&lt;Int&gt;()</span><br><span class="line"></span><br><span class="line">val ids: Array&lt;Int&gt; = arrayof()</span><br><span class="line">val ids : IntArray = IntArrayOf)</span><br></pre></td></tr></table></figure>
+
+<p>总的来说，</p>
+<ul>
+<li>可空的基本数据类型，会被编译成装箱类;</li>
+<li>泛型中基本数据类型，在使用时，会自动拆装箱;</li>
+<li>泛型数组，使用的是装箱类型。</li>
+<li>出于性能考虑，为避免自动拆装箱所带来的开销，在Kotlin中，应当<strong>尽量避免使用可空的基本数据类型，以及泛型数组；</strong></li>
+</ul>
+<p>3）<strong>Kotlin的高阶函数（返回函数或参数是函数）</strong></p>
+<ul>
+<li>从性能上讲，<strong>高阶函数要创建实例，所以开销会增大。</strong></li>
+<li>Kotlin的匿名内部类，在和外部类有互动的时候，也会持有外部类的引用，<strong>存在一定的、潜在的内存泄漏的风险。</strong></li>
+<li><strong><del>高阶函数是通过中间代码添加生成的</del></strong></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class类名$方法名$1 : FunctionReference(receiver:方法所在类)，Funtion1 &#123;</span><br><span class="line">  override fun invoke(p1: Int) &#123;</span><br><span class="line">    receiver.showFailedState(p1)</span><br><span class="line">  &#125;</span><br><span class="line">  override fun getOwner() : KDeclarationContainer &#123;</span><br><span class="line">    return Reflection. getOrCreateKotlinClass(方法所在类.class);</span><br><span class="line">  &#125;</span><br><span class="line">  override fun getName() : String &#123;</span><br><span class="line">    return &quot;showFailedState&quot;</span><br><span class="line">  &#125;</span><br><span class="line">  override fun getSignature() : String &#123; </span><br><span class="line">    return &quot;showFailedState(I)V&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://s2.loli.net/2023/07/31/7dKW5AalpJCITBy.webp"></p>
+<p>4）<strong>顶层函数</strong></p>
+<ul>
+<li>Java中的函数，必须在类的内部定义;</li>
+<li>而 Kotlin 中允许在类的外部，定义文件级别的顶层函数以及变量。</li>
+<li>从字节码层面来说，所有的函数和变量都必须在类的内部；</li>
+<li>Kotlin编译器，在生成字节码时，会给顶层的函数及变量，创建一个所属的类，类名默认规则是文件名+Kt ;</li>
+<li>Java代码，可以通过这些Kt结尾的类，调用到这些在Kotlin中定义的顶层函数和变量；</li>
+<li>也是通过<strong>中间代码添加生成的</strong></li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">//TimeUtil.kt  </span><br><span class="line">fun printTime() &#123;</span><br><span class="line">  //....</span><br><span class="line">&#125;</span><br><span class="line">// build 后</span><br><span class="line">class TimeUitlKt() &#123;</span><br><span class="line">  static void printTime() &#123;</span><br><span class="line">    //...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>5）<strong>扩展函数</strong></p>
+<ul>
+<li>通过<strong>中间代码添加生成的</strong></li>
+<li><strong>变成类的静态方法，或者是类似顶层函数的逻辑</strong></li>
+</ul>
+<p>6）<strong>inline 函数</strong></p>
+<ul>
+<li>通过<strong>中间代码添加生成的</strong></li>
+<li>inline函数除了能解决泛型具体化问题，还比一般的函数更有性能优势，因为代码的添加发生在编译时，运行时会减少一次虚拟机栈中栈帧的入栈出栈操作;</li>
+<li>inline函数的副作用是，会导致代码体积增长;</li>
+</ul>
+<p>7）其他</p>
+<ul>
+<li><strong>数据类 data class</strong> -&gt; final class, 生成 getter()、setter()、equals()、hashCode()、toString()、componentN()、copy()</li>
+<li><strong>密封类 sealed class</strong> -&gt; abstract class + static final inner class</li>
+<li><strong>内联类 inline class</strong>-&gt; final class, 构造参数变成类的属性</li>
+<li><strong>接口里面的默认实现</strong>-&gt; 会生成默认实现的类，里面对应实现的方法</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">interface IFace &#123;</span><br><span class="line">    fun func() &#123;</span><br><span class="line">        println(“hello”)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public interface IFace &#123;</span><br><span class="line">   void func();</span><br><span class="line">   @Metadata(</span><br><span class="line">      mv = &#123;1, 7, 0&#125;,</span><br><span class="line">      k = 3</span><br><span class="line">   )</span><br><span class="line">   public static final class DefaultImpls &#123;</span><br><span class="line">      public static void func(@NotNull IFace $this) &#123;</span><br><span class="line">         String var1 = “hello”;</span><br><span class="line">         System.out.println(var1);</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>**类型的可空性检查 -&gt;**编译的时候会补充上 NotNull 或 NullAble</p>
+</li>
+<li><p><strong>泛型的可空检查</strong>-&gt; 通过 Kotlin 的 Metadata<br>val names &#x3D; listOf&lt;String?&gt;(“Vincent”, null)<br><img src="https://s2.loli.net/2023/07/31/RZWu12D6fGao5kM.webp"></p>
+</li>
+<li><p>字符串模板 -&gt; 编译器最终会将它们转换成 Java 拼接的形式。</p>
+</li>
+<li><p>when 表达式 -&gt; 编译器最终会将它们转换成类似 switch case 的语句。</p>
+</li>
+<li><p>类默认 public -&gt; Kotlin 当中被我们省略掉 public，最终会被编译器补充。</p>
+</li>
+<li><p>嵌套类默认 static -&gt; 我们在 Kotlin 当中的嵌套类，默认会被添加 static 关键字，将其变成静态内部类，防止不必要的内存泄漏。</p>
+</li>
+<li><p>lateinit -&gt; lateinit 用于变量 var，只是让编译期间忽略对属性未初始化的检查，后续在哪里什么时候初始化由开发者决定</p>
+</li>
+</ul>
+</br>
+
+<h3 id="suspend-的原理"><a href="#suspend-的原理" class="headerlink" title="suspend 的原理"></a>suspend 的原理</h3><ul>
+<li><strong>挂起函数的本质，就是 Callback</strong></li>
+<li>这个“从挂起函数转换成 CallBack 函数”的过程，被叫做是 CPS 转换（Continuation-Passing-Style Transformation）</li>
+<li>反编译转成 Java 后，可以看到suspend 函数的参数多了一个 Continuation 的类（里面有协程的上下文，和 resumeWith方法），内部是通过 label 来实现程序的 goto 功能，从而实现“状态机”的效果 （详细代码分析略）</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">suspend fun getUserInfo(): String &#123;</span><br><span class="line">   withContext(Dispatchers.IO) &#123; </span><br><span class="line">     delay(1000L) </span><br><span class="line">   &#125; </span><br><span class="line">   return “cfanr”</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//                              Continuation 等价于 CallBack</span><br><span class="line">//                                         ↓         </span><br><span class="line">public static final Object getUserInfo(Continuation $completion) &#123;</span><br><span class="line">  …</span><br><span class="line">  return “cfanr”;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public interface Continuation&lt;in T&gt; &#123;</span><br><span class="line">    public val context: CoroutineContext</span><br><span class="line">//      相当于 CallBack的onSuccess   结果   </span><br><span class="line">//                 ↓                 ↓</span><br><span class="line">    public fun resumeWith(result: Result&lt;T&gt;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>—End—</p>
+
+        </div>
+
+        
+
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2022/05/15/A-Friendlier-Solution-For-Unity-And-Android-mixed-development/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Unity 和 Android 混合开发更友好的方案</span>
+                                <span class="post-nav-item">Prev posts</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2019/05/19/kotlin-usage-tips/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Kotlin 开发小 tips</span>
+                                <span class="post-nav-item">Next posts</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>
+              -
+            
+            2023&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a>&nbsp;|&nbsp;Theme&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.5</a>
+        </div>
+        
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

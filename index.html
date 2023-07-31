@@ -164,6 +164,38 @@
                 
 
                 <h3 class="home-article-title">
+                    <a href="/2021/03/30/Kotlin-implement-the-features-that-don-t-exist-in-Java/">
+                        Kotlin 是如何实现 Java 不存在的特性的？
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        <p>之前初次接触 Kotlin 时，总有个疑问，同样是运行在 JVM 内，而且 Kotlin 和 Java 可以无缝混合开发，那究竟 <strong>Kotlin 是如何实现 Java 不存在的特性的呢？</strong> 今天就来粗略了解这些语法糖的奥妙。</p>
+<blockquote>
+<p>Kotlin 支持的 Java 中没有的特性：类型推断、可变性、可空性、自动拆装箱、泛型数组、高阶函数、DSL、顶层函数、扩展函数、内联函数、伴生对象、数据类、密封类、单例类、类代理、internal、泛型具体化……  </p>
+</blockquote>
+<p>先说结论，Kotlin 编译器通过以下几种方式支持 Java 没有的特性：<br><strong>编译器推断、中间代码添加、元注解、Metadata</strong></p>
+                    
+                </div>
+
+                <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fas fa-history"></i>&nbsp;<span class="home-article-date" data-date="Tue Mar 30 2021 13:08:47 GMT+0800">2021-03-30</span></span>
+        
+        
+    </div>
+
+    <a href="/2021/03/30/Kotlin-implement-the-features-that-don-t-exist-in-Java/">Read more&nbsp;<i class="fas fa-angle-right"></i></a>
+</div>
+
+            </li>
+        
+            <li class="home-article-item">
+
+                
+
+                <h3 class="home-article-title">
                     <a href="/2019/05/19/kotlin-usage-tips/">
                         Kotlin 开发小 tips
                     </a>
@@ -438,45 +470,6 @@
 
             </li>
         
-            <li class="home-article-item">
-
-                
-
-                <h3 class="home-article-title">
-                    <a href="/2017/07/18/wechat-mars-android-sample-source-code-analyze/">
-                        微信 Mars Android Sample 源码分析
-                    </a>
-                </h3>
-
-                <div class="home-article-content markdown-body">
-                    
-                        <p>整个 Sample 提供了以下功能：</p>
-<ul>
-<li>基于TCP长连接的聊天室体验。</li>
-<li>数据通信成功率、耗时、流量的展示。</li>
-<li>网络状况检测结果展示。</li>
-</ul>
-<h3 id="一、本地运行-Server-端"><a href="#一、本地运行-Server-端" class="headerlink" title="一、本地运行 Server 端"></a>一、本地运行 Server 端</h3><p>具体如何运行 Server 端，参照官方wiki：<a class="link"   target="_blank" rel="noopener" href="https://github.com/Tencent/mars/wiki/Mars-sample-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E#server%E5%90%AF%E5%8A%A8" >Mars Sample 使用说明 <i class="fas fa-external-link-alt"></i></a></p>
-<h3 id="二、修改-Android-Sample"><a href="#二、修改-Android-Sample" class="headerlink" title="二、修改 Android Sample"></a>二、修改 Android Sample</h3><p>下面说下Android 端该如何修改源码连接到本地服务器</p>
-<ul>
-<li>1.全局搜索<code>marsopen.cn</code>，修改替换为localhost</li>
-<li>2.在保证 <code>app/build.gradle</code> 下<code>useLocalMarsWrapper = true</code>的情况下，在 wrapper module 下修改 <code>com.tencent.mars.sample.wrapper.service. MarsServiceStub.java</code> 的 dns 解析的地址为本地主机的 IP 地址 （wiki 上没写清楚）<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> String[] onNewDns(String host) &#123;</span><br><span class="line">    <span class="comment">// No default new dns support</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;192.168.24.193&quot;</span>&#125;; <span class="comment">//替换为本地主机的 IP 地址</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-                    
-                </div>
-
-                <div class="home-article-meta-info-container">
-    <div class="home-article-meta-info">
-        <span><i class="fas fa-history"></i>&nbsp;<span class="home-article-date" data-date="Tue Jul 18 2017 20:21:53 GMT+0800">2017-07-18</span></span>
-        
-        
-    </div>
-
-    <a href="/2017/07/18/wechat-mars-android-sample-source-code-analyze/">Read more&nbsp;<i class="fas fa-angle-right"></i></a>
-</div>
-
-            </li>
-        
     </ul>
 
     <div class="home-paginator">
@@ -508,7 +501,7 @@
               <span>2020</span>
               -
             
-            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+            2023&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
         </div>
         
         <div class="theme-info info-item">

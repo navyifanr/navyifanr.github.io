@@ -120,6 +120,35 @@
                 
 
                 <h3 class="home-article-title">
+                    <a href="/2016/04/25/Android-realize-multi-type-item-s-layout-by-ListView/">
+                        Android利用ListView实现多种Item的复杂布局
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        <p>在Android开发中，可能会遇到一个可滚动且布局比较复杂的界面，但它并不是一个纯粹的List，类似如下图:</p>
+<p><img src="http://7xigjz.com1.z0.glb.clouddn.com/160425-demo.bmp" alt="demo.png"><br>通常实现方法可以直接用一个ScrollView将所有内容包起来，里面是列表的部分在代码中用动态添加布局的方式实现；或者外层ScrollView，里面列表部分用ListView(或RecyclerView)实现，但这样需要解决滑动冲突问题(有时并不能很好解决)……所以最好不要同时使用ScrollView和ListView(或RecyclerView)，但如果单使用ScrollView，每次滑动返回时都会重新动态加载，如果页面图片比较多，可能会造成卡顿，所以要自己做缓存判断的处理，而ListView自带有缓存机制，处理相对比较方便。</p>
+                    
+                </div>
+
+                <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fas fa-history"></i>&nbsp;<span class="home-article-date" data-date="Mon Apr 25 2016 11:25:27 GMT+0800">2016-04-25</span></span>
+        
+        
+    </div>
+
+    <a href="/2016/04/25/Android-realize-multi-type-item-s-layout-by-ListView/">Read more&nbsp;<i class="fas fa-angle-right"></i></a>
+</div>
+
+            </li>
+        
+            <li class="home-article-item">
+
+                
+
+                <h3 class="home-article-title">
                     <a href="/2015/08/23/the-summary-of-working-one-month/">
                         工作一个月总结
                     </a>
@@ -381,34 +410,6 @@
 
             </li>
         
-            <li class="home-article-item">
-
-                
-
-                <h3 class="home-article-title">
-                    <a href="/2015/04/04/how-to-use-apktool/">
-                        android apktool使用
-                    </a>
-                </h3>
-
-                <div class="home-article-content markdown-body">
-                    
-                        <p>###为什么需要了解？<br>通过apktool反编译获取别人app里面的图片资源和xml文件的布局设计来进行学习。<br>###需要条件(windows平台下)<br>1.配置好Java环境<br>2.下载最新版的apktool的jar包:<br><a class="link"   target="_blank" rel="noopener" href="https://bitbucket.org/iBotPeaches/apktool/downloads" >https://bitbucket.org/iBotPeaches/apktool/downloads<i class="fas fa-external-link-alt"></i></a><br>3.测试用的任意.apk安装包: xxx.apk</p>
-                    
-                </div>
-
-                <div class="home-article-meta-info-container">
-    <div class="home-article-meta-info">
-        <span><i class="fas fa-history"></i>&nbsp;<span class="home-article-date" data-date="Sat Apr 04 2015 14:25:46 GMT+0800">2015-04-04</span></span>
-        
-        
-    </div>
-
-    <a href="/2015/04/04/how-to-use-apktool/">Read more&nbsp;<i class="fas fa-angle-right"></i></a>
-</div>
-
-            </li>
-        
     </ul>
 
     <div class="home-paginator">
@@ -444,7 +445,7 @@
               <span>2020</span>
               -
             
-            2022&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
+            2023&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">cfanr</a>
         </div>
         
         <div class="theme-info info-item">
